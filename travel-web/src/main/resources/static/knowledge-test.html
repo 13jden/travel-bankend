@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识库管理测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button.danger {
+            background: #dc3545;
+        }
+        button.danger:hover {
+            background: #c82333;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .status-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .status-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .status-value {
+            color: #6c757d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>知识库管理测试</h1>
+    
+    <!-- 知识库状态 -->
+    <div class="container">
+        <h2>知识库状态</h2>
+        <button onclick="getStatus()">获取状态</button>
+        <button onclick="getInfo()">获取详细信息</button>
+        <div id="statusResult"></div>
+    </div>
+
+    <!-- 文件上传 -->
+    <div class="container">
+        <h2>文件上传</h2>
+        <div class="form-group">
+            <label for="singleFile">选择单个文件：</label>
+            <input type="file" id="singleFile" accept=".pdf,.doc,.docx,.txt">
+        </div>
+        <button onclick="uploadSingleFile()">上传单个文件</button>
+        
+        <div class="form-group">
+            <label for="batchFiles">选择多个文件：</label>
+            <input type="file" id="batchFiles" multiple accept=".pdf,.doc,.docx,.txt">
+        </div>
+        <button onclick="uploadBatchFiles()">批量上传</button>
+        
+        <div id="uploadResult"></div>
+    </div>
+
+    <!-- 知识库管理 -->
+    <div class="container">
+        <h2>知识库管理</h2>
+        <button onclick="deleteIndex()" class="danger">删除知识库索引</button>
+        <div id="deleteResult"></div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/knowledge';
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = message;
+        }
+
+        async function getStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/status`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const statusHtml = `
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <div class="status-label">知识库ID</div>
+                                <div class="status-value">${data.data.indexId}</div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-label">分类ID</div>
+                                <div class="status-value">${data.data.categoryId}</div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-label">工作空间ID</div>
+                                <div class="status-value">${data.data.workspaceId}</div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-label">状态</div>
+                                <div class="status-value">${data.data.status}</div>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('statusResult').innerHTML = statusHtml;
+                } else {
+                    showResult('statusResult', `获取状态失败: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('statusResult', `请求失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function getInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/index/info`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('statusResult', `知识库信息:\n${JSON.stringify(JSON.parse(data.data), null, 2)}`, 'success');
+                } else {
+                    showResult('statusResult', `获取信息失败: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('statusResult', `请求失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function uploadSingleFile() {
+            const fileInput = document.getElementById('singleFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showResult('uploadResult', '请选择要上传的文件', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('uploadResult', `上传成功: ${data.message}\n任务ID: ${data.taskId}`, 'success');
+                } else {
+                    showResult('uploadResult', `上传失败: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('uploadResult', `请求失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function uploadBatchFiles() {
+            const fileInput = document.getElementById('batchFiles');
+            const files = fileInput.files;
+            
+            if (files.length === 0) {
+                showResult('uploadResult', '请选择要上传的文件', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/upload/batch`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('uploadResult', `批量上传成功: ${data.message}\n总文件数: ${data.totalFiles}\n成功: ${data.successCount}\n失败: ${data.failCount}`, 'success');
+                } else {
+                    showResult('uploadResult', `批量上传失败: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('uploadResult', `请求失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteIndex() {
+            if (!confirm('确定要删除知识库索引吗？此操作不可逆！')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/index`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('deleteResult', `删除成功: ${data.message}`, 'success');
+                } else {
+                    showResult('deleteResult', `删除失败: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('deleteResult', `请求失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 页面加载时自动获取状态
+        window.onload = function() {
+            getStatus();
+        };
+    </script>
+</body>
+</html> 
