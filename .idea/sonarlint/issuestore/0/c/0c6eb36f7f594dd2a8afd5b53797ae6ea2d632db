@@ -1,8 +1,0 @@
-
-a	java:S1120"FDefine and throw a dedicated exception instead of using a generic one.(ıîšc8–¹’â3
-g	java:S1126"FDefine and throw a dedicated exception instead of using a generic one.(şÅ¸‚şÿÿÿÿ8–¹’â3
-V
-java:S3516"9Refactor this method to not always return the same value.(ä®Ò8£¹’â3
-Z	java:S106("9Replace this use of System.out or System.err by a logger.(¹ÜÇ¯ûÿÿÿÿ8®¹’â3
-U	java:S1063"9Replace this use of System.out or System.err by a logger.(ñšÔ8²¹’â3
-X	java:S125:"<This block of commented-out lines of code should be removed.(ØäÌ±8³¹’â3

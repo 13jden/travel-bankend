@@ -1,15 +1,0 @@
-
-[	java:S112#"FDefine and throw a dedicated exception instead of using a generic one.(Ó„ä’
-X	java:S125"<This block of commented-out lines of code should be removed.(ØÆ†Á8¸Œùå3
-X	java:S125"<This block of commented-out lines of code should be removed.(Ì‰¸„8è¦ùå3
-U
-java:S1854":Remove this useless assignment to local variable "result".(äö²™ÿÿÿÿÿ
-F
-java:S1481"+Remove this unused "result" local variable.(äö²™ÿÿÿÿÿ
-Z
-java:S1854'"8Remove this useless assignment to local variable "user".(´“Ë‰øÿÿÿÿ8†öøå3
-Q
-java:S1172 "/Remove this unused method parameter "password".(˜ö«þÿÿÿÿ8‰öøå3
-K
-java:S1481'")Remove this unused "user" local variable.(´“Ë‰øÿÿÿÿ8öøå3
-]	java:S125)"<This block of commented-out lines of code should be removed.(æÎáÿýÿÿÿÿ8öøå3
