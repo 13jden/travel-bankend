@@ -22,18 +22,16 @@ COPY travel-admin/src travel-admin/src
 RUN mvn clean package -DskipTests
 
 # 运行阶段
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17-jre-alpine
 
 # 设置工作目录
 WORKDIR /app
 
 # 安装必要的工具
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache curl
 
 # 创建非root用户
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN addgroup -S appuser && adduser -S appuser -G appuser
 
 # 复制构建好的jar文件
 COPY --from=builder /app/travel-admin/target/travel-admin-*.jar app.jar
