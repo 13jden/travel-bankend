@@ -1,41 +1,178 @@
-name: Docker Build and Push
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "main", "develop" ]
+  pull_request:
+    branches: [ "master", "main" ]
 
 permissions:
   contents: read
   packages: write
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
-  docker:
+  test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+        
+    - name: Run tests
+      run: mvn clean test -B
+      
+    - name: Generate test report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: Maven Tests
+        path: '**/target/surefire-reports/*.xml'
+        reporter: java-junit
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-tags: ${{ steps.meta.outputs.tags }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-    - name: Log in to GitHub Container Registry
+      
+    - name: Log in to Container Registry
       uses: docker/login-action@v3
       with:
-        registry: ghcr.io
+        registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Extract metadata (tags, labels)
+        
+    - name: Extract metadata
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: |
-          ghcr.io/${{ github.repository_owner }}/travel-spring
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=raw,value=latest
+          type=ref,event=branch
+          type=ref,event=pr
           type=sha,format=long
-    - name: Build and push
+          type=raw,value=latest,enable={{is_default_branch}}
+        labels: |
+          org.opencontainers.image.title=Travel Spring Boot App
+          org.opencontainers.image.description=乡村旅游后端服务
+          
+    - name: Build and push Docker image
+      id: build
       uses: docker/build-push-action@v6
       with:
         context: .
+        platforms: linux/amd64,linux/arm64
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        
+    - name: Generate SBOM
+      uses: anchore/sbom-action@v0
+      with:
+        image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+        format: spdx-json
+        output-file: sbom.spdx.json
+        
+    - name: Upload SBOM
+      uses: actions/upload-artifact@v4
+      with:
+        name: sbom
+        path: sbom.spdx.json
+
+  deploy-staging:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    steps:
+    - name: Deploy to staging
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USER }}
+        key: ${{ secrets.STAGING_SSH_KEY }}
+        script: |
+          cd /opt/travel-spring
+          echo "开始部署到测试环境..."
+          echo "镜像: ${{ needs.build-and-push.outputs.image-tags }}"
+          
+          # 更新 docker-compose.yml 中的镜像标签
+          sed -i "s|ghcr.io/\${GITHUB_REPOSITORY}/travel-spring:.*|${{ needs.build-and-push.outputs.image-tags }}|g" docker-compose.yml
+          
+          # 拉取最新镜像并重启服务
+          docker-compose pull travel-app
+          docker-compose up -d travel-app
+          
+          # 等待服务启动
+          sleep 30
+          
+          # 健康检查
+          if curl -f http://localhost:8080/actuator/health; then
+            echo "✅ 测试环境部署成功！"
+          else
+            echo "❌ 测试环境部署失败！"
+            exit 1
+          fi
+
+  deploy-production:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+    - name: Deploy to production
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.PROD_HOST }}
+        username: ${{ secrets.PROD_USER }}
+        key: ${{ secrets.PROD_SSH_KEY }}
+        script: |
+          cd /opt/travel-spring
+          echo "开始部署到生产环境..."
+          echo "镜像: ${{ needs.build-and-push.outputs.image-tags }}"
+          
+          # 备份当前版本
+          docker-compose ps > backup-$(date +%Y%m%d-%H%M%S).log
+          
+          # 更新 docker-compose.yml 中的镜像标签
+          sed -i "s|ghcr.io/\${GITHUB_REPOSITORY}/travel-spring:.*|${{ needs.build-and-push.outputs.image-tags }}|g" docker-compose.yml
+          
+          # 拉取最新镜像
+          docker-compose pull travel-app
+          
+          # 滚动更新（零停机部署）
+          docker-compose up -d travel-app
+          
+          # 等待服务启动
+          sleep 45
+          
+          # 健康检查
+          if curl -f http://localhost:8080/actuator/health; then
+            echo "✅ 生产环境部署成功！"
+            # 清理旧镜像
+            docker image prune -f
+          else
+            echo "❌ 生产环境部署失败，请检查日志！"
+            docker-compose logs travel-app
+            exit 1
+          fi
