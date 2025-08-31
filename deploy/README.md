@@ -1,19 +1,23 @@
 # 🚀 乡村旅游后端服务部署指南
 
-## 自动部署流程
+## Self-Hosted Runner 自动部署
 
-### 1. GitHub Actions 自动部署
+使用 self-hosted runner 在您的服务器上直接运行 workflow，实现**构建、推镜像、部署一步到位**！
 
-项目配置了完整的 CI/CD 流水线，推送代码即可自动触发部署：
+### 🎯 优势
+- ✅ **本地构建**：无需等待 GitHub 云端构建
+- ✅ **直接部署**：构建完成立即部署，无需 SSH
+- ✅ **更快速度**：本地网络，镜像推拉更快
+- ✅ **资源可控**：使用自己的服务器资源
 
-#### 📋 触发条件
+### 📋 触发条件
 - **测试环境**: 推送到 `develop` 分支
 - **生产环境**: 推送到 `main/master` 分支
 
-#### 🔄 自动化流程
-1. **代码测试** → 运行单元测试
-2. **镜像构建** → 构建 Docker 镜像并推送到 GitHub Container Registry
-3. **自动部署** → SSH 连接服务器并部署最新版本
+### 🔄 自动化流程
+1. **代码测试** → 在服务器上运行单元测试
+2. **镜像构建** → 在服务器上构建 Docker 镜像并推送
+3. **立即部署** → 直接在服务器上部署最新版本
 
 ### 2. 本地推送触发部署
 
@@ -29,49 +33,64 @@ git merge develop
 git push origin main     # 🚀 自动部署到生产环境
 ```
 
-## 服务器配置
+## Self-Hosted Runner 配置
 
-### 1. GitHub Secrets 配置
+### 1. 一键安装 Runner
 
-在 GitHub 仓库设置中添加以下 Secrets：
-
-#### 测试环境
-- `STAGING_HOST`: 测试服务器 IP 地址
-- `STAGING_USER`: 服务器用户名
-- `STAGING_SSH_KEY`: SSH 私钥
-
-#### 生产环境  
-- `PROD_HOST`: 生产服务器 IP 地址
-- `PROD_USER`: 服务器用户名
-- `PROD_SSH_KEY`: SSH 私钥
-
-### 2. 服务器初始化
-
-在服务器上运行以下命令：
+在您的服务器上运行：
 
 ```bash
-# 下载部署脚本
-wget https://raw.githubusercontent.com/your-username/travel-spring/main/deploy/server-deploy.sh
-chmod +x server-deploy.sh
+# 下载安装脚本
+wget https://raw.githubusercontent.com/your-username/travel-spring/main/deploy/setup-runner.sh
+chmod +x setup-runner.sh
 
-# 一键初始化环境
-./server-deploy.sh init
+# 一键安装环境
+sudo ./setup-runner.sh install
 ```
 
-### 3. 手动操作命令
+### 2. 配置 GitHub Runner
+
+安装完成后，按照提示配置：
 
 ```bash
-# 查看服务状态
-./server-deploy.sh status
+# 1. 获取 Runner Token
+# 进入 GitHub 仓库 → Settings → Actions → Runners → New self-hosted runner
 
-# 查看日志
-./server-deploy.sh logs
+# 2. 配置 Runner
+sudo -u github-runner bash
+cd /home/github-runner/actions-runner
+./config.sh --url https://github.com/YOUR_USERNAME/YOUR_REPO --token YOUR_TOKEN
 
-# 重启服务
-./server-deploy.sh restart
+# 3. 启动服务
+exit  # 退出 github-runner 用户
+sudo systemctl enable github-runner
+sudo systemctl start github-runner
+```
 
-# 手动更新
-./server-deploy.sh update
+### 3. 修改仓库地址
+
+编辑配置文件，将 `your-username` 替换为您的 GitHub 用户名：
+
+```bash
+# 测试环境
+sudo nano /opt/travel-spring-staging/docker-compose.yml
+
+# 生产环境  
+sudo nano /opt/travel-spring-production/docker-compose.yml
+```
+
+### 4. Runner 管理命令
+
+```bash
+# 查看 Runner 状态
+./setup-runner.sh status
+
+# 查看 Runner 日志
+./setup-runner.sh logs
+
+# 启动/停止 Runner
+./setup-runner.sh start
+./setup-runner.sh stop
 ```
 
 ## 🔧 环境配置
@@ -141,12 +160,35 @@ docker-compose up -d
 
 ## 🎯 快速开始
 
-1. **配置 GitHub Secrets**（服务器 SSH 信息）
-2. **修改仓库地址**（在 `server-deploy.sh` 中）
-3. **推送代码触发部署**：
+### 方案一：Self-Hosted Runner（推荐）
+
+1. **安装 Runner**：`sudo ./setup-runner.sh install`
+2. **配置 GitHub Token**（获取方式见上文）
+3. **修改仓库地址**（在 docker-compose.yml 中）
+4. **推送代码触发部署**：
    ```bash
-   git push origin develop  # 部署到测试环境
-   git push origin main     # 部署到生产环境
+   git push origin develop  # 服务器自动构建并部署到测试环境
+   git push origin main     # 服务器自动构建并部署到生产环境
    ```
 
-就是这么简单！🎉 
+### 方案二：远程 SSH 部署
+
+如果不想使用 self-hosted runner，可以使用原来的 SSH 方式：
+
+1. **配置 GitHub Secrets**（服务器 SSH 信息）
+2. **修改 workflow** 使用 `ubuntu-latest` 而不是 `self-hosted`
+3. **推送代码触发部署**
+
+## 🔄 Self-Hosted Runner 工作流程
+
+```mermaid
+graph LR
+    A[推送代码] --> B[触发 Workflow]
+    B --> C[服务器运行测试]
+    C --> D[服务器构建镜像]
+    D --> E[推送到 Registry]
+    E --> F[服务器直接部署]
+    F --> G[部署完成]
+```
+
+**一切都在您的服务器上完成，无需外部依赖！** 🎉 
