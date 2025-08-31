@@ -1,5 +1,5 @@
 # 多阶段构建 - 构建阶段
-FROM maven:3.9.6-openjdk-17 AS builder
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
 # 设置工作目录
 WORKDIR /app
@@ -22,23 +22,24 @@ COPY travel-admin/src travel-admin/src
 RUN mvn clean package -DskipTests
 
 # 运行阶段
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre-jammy
 
 # 设置工作目录
 WORKDIR /app
 
-# 安装必要的工具
-RUN apk add --no-cache curl
+# 设置时区
+ENV TZ=Asia/Shanghai
 
-# 创建非root用户
-RUN addgroup -S appuser && adduser -S appuser -G appuser
+# 安装必要的工具和字体
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl fonts-noto-cjk && \
+    rm -rf /var/lib/apt/lists/*
+
+# 设置环境变量
+ENV SPRING_PROFILES_ACTIVE=prod
 
 # 复制构建好的jar文件
 COPY --from=builder /app/travel-admin/target/travel-admin-*.jar app.jar
-
-# 设置文件权限
-RUN chown -R appuser:appuser /app
-USER appuser
 
 # 暴露端口
 EXPOSE 8080
@@ -48,4 +49,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # 启动应用
-ENTRYPOINT ["java", "-jar", "app.jar"] 
+CMD ["java", "-jar", "app.jar"] 
