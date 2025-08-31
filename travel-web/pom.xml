@@ -43,7 +43,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>travel</groupId>
+            <groupId>com.dzk</groupId>
             <artifactId>travel-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
@@ -72,12 +72,6 @@
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-core</artifactId>
             <version>1.0.0.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.dzk</groupId>
-            <artifactId>travel-common</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <!-- 阿里云百炼SDK -->

@@ -4,13 +4,16 @@ FROM maven:3.9.6-eclipse-temurin-17 AS builder
 # 设置工作目录
 WORKDIR /app
 
-# 复制pom文件
+# 设置时区
+ENV TZ=Asia/Shanghai
+
+# 复制 Maven 配置文件
 COPY pom.xml .
 COPY travel-common/pom.xml travel-common/
 COPY travel-web/pom.xml travel-web/
 COPY travel-admin/pom.xml travel-admin/
 
-# 下载依赖
+# 下载依赖（先下载依赖以利用 Docker 缓存）
 RUN mvn dependency:go-offline -B
 
 # 复制源代码
@@ -19,7 +22,7 @@ COPY travel-web/src travel-web/src
 COPY travel-admin/src travel-admin/src
 
 # 构建应用
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -B
 
 # 运行阶段
 FROM eclipse-temurin:17-jre-jammy
