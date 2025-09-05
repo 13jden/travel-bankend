@@ -1,5 +1,5 @@
 name: Build Feature Branch
-run-name: ${{ github.actor }} Exec Gitea Actions 🚀
+run-name: ${{ github.actor }} - ${{ github.event.head_commit.message }} 🚀
 on:
   push:
     branches:

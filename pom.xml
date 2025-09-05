@@ -128,7 +128,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <skip>true</skip> <!-- 跳过 repackage 目标 -->
+                    <skip>true</skip> <!-- 默认跳过，子模块可以覆盖 -->
                 </configuration>
             </plugin>
             <plugin>
@@ -136,7 +136,7 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>
                 <configuration>
-                    <encoding>UTF-8</encoding> <!-- 指定编码为 UTF-8 -->
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
         </plugins>
