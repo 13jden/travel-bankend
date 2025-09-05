@@ -24,8 +24,8 @@ COPY travel-admin/src travel-admin/src
 # 构建应用
 RUN mvn clean package -DskipTests -B
 
-# 运行阶段
-FROM eclipse-temurin:17-jre-jammy
+# 运行阶段 - 使用更轻量的基础镜像
+FROM eclipse-temurin:17-jre-alpine
 
 # 设置工作目录
 WORKDIR /app
@@ -33,10 +33,8 @@ WORKDIR /app
 # 设置时区
 ENV TZ=Asia/Shanghai
 
-# 安装必要的工具和字体
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl fonts-noto-cjk && \
-    rm -rf /var/lib/apt/lists/*
+# Alpine使用apk而不是apt-get
+RUN apk add --no-cache curl
 
 # 设置环境变量
 ENV SPRING_PROFILES_ACTIVE=prod
@@ -45,11 +43,11 @@ ENV SPRING_PROFILES_ACTIVE=prod
 COPY --from=builder /app/travel-admin/target/travel-admin-*.jar app.jar
 
 # 暴露端口
-EXPOSE 8080
+EXPOSE 8081
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8080/actuator/health || exit 1
+    CMD curl -f http://localhost:8081/actuator/health || exit 1
 
 # 启动应用
 CMD ["java", "-jar", "app.jar"] 
