@@ -1,5 +1,5 @@
-name: Build and Deploy to Aliyun ACR
-run-name: ${{ github.actor }} 构建并部署到阿里云 🚀
+name: Build Feature Branch
+run-name: ${{ github.actor }} Exec Gitea Actions 🚀
 on:
   push:
     branches:
