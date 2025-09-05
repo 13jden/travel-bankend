@@ -1,30 +1,21 @@
-# Multi-stage build - Build stage
-FROM maven:3.9.6-eclipse-temurin-17 AS builder
+# Multi-stage build for GitHub Actions
+FROM eclipse-temurin:17-jdk-alpine AS builder
 
 # Set working directory
 WORKDIR /app
 
-# Set timezone
-ENV TZ=Asia/Shanghai
-
-# Copy Maven configuration files
+# Copy pom.xml and download dependencies
 COPY pom.xml .
-COPY travel-common/pom.xml travel-common/
-COPY travel-web/pom.xml travel-web/
 COPY travel-admin/pom.xml travel-admin/
-
-# Download dependencies (to leverage Docker cache)
 RUN mvn dependency:go-offline -B
 
 # Copy source code
-COPY travel-common/src travel-common/src
-COPY travel-web/src travel-web/src
-COPY travel-admin/src travel-admin/src
+COPY . .
 
-# Build application
-RUN mvn clean package -DskipTests -B
+# Build the application
+RUN mvn clean package -DskipTests
 
-# Runtime stage - Use lighter base image
+# Runtime stage
 FROM eclipse-temurin:17-jre-alpine
 
 # Set working directory
@@ -33,7 +24,7 @@ WORKDIR /app
 # Set timezone
 ENV TZ=Asia/Shanghai
 
-# Alpine uses apk instead of apt-get
+# Install curl for health check
 RUN apk add --no-cache curl
 
 # Create upload directory
@@ -42,8 +33,11 @@ RUN mkdir -p /app/uploads
 # Set environment variables
 ENV SPRING_PROFILES_ACTIVE=prod
 
-# Copy built jar file
-COPY --from=builder /app/travel-admin/target/travel-admin-*.jar app.jar
+# Copy the built jar from builder stage
+COPY --from=builder /app/travel-admin/target/travel-admin-0.0.1-SNAPSHOT.jar app.jar
+
+# Verify the jar file
+RUN jar tf app.jar | head -20
 
 # Expose port
 EXPOSE 8081
