@@ -1,6 +1,9 @@
 # Multi-stage build for GitHub Actions
 FROM eclipse-temurin:17-jdk-alpine AS builder
 
+# Install Maven
+RUN apk add --no-cache maven
+
 # Set working directory
 WORKDIR /app
 
