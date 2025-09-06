@@ -78,7 +78,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <skip>false</skip> <!-- 明确启用 -->
-                    <mainClass>com.dzk.admin.adminApplication</mainClass>
+                    <mainClass>com.dzk.admin.WebApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>

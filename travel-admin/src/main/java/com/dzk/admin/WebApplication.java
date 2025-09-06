@@ -14,10 +14,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableAsync
 @ComponentScan(basePackages = {"com.dzk.common", "com.dzk.admin", "com.dzk.web"})
 @MapperScan({"com.dzk.admin.api", "com.dzk.web"})
-public class adminApplication {
+public class WebApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(adminApplication.class, args);
+		SpringApplication.run(WebApplication.class, args);
 	}
 
 }

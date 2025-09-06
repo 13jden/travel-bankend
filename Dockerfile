@@ -49,5 +49,5 @@ EXPOSE 8081
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8081/actuator/health || exit 1
 
-# 启动应用
-CMD ["java", "-jar", "app.jar"] 
+# 启动应用 - 使用显式主类
+CMD ["java", "-cp", "app.jar", "com.dzk.admin.WebApplication"]
