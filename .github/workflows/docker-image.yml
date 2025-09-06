@@ -74,7 +74,7 @@ jobs:
               cd /opt/travel-backend
               git pull origin master
             else
-              git clone git@github.com:13jden/travel-backend.git /opt/travel-backend
+              git clone git@github.com:13jden/travel-bankend.git /opt/travel-backend
               cd /opt/travel-backend
             fi
             
