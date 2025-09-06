@@ -57,14 +57,19 @@ jobs:
             mkdir -p /opt/travel-backend
             
             # 配置 SSH 密钥
-            eval "$(ssh-agent -s)"
-            echo "${{ secrets.SSH_PRIVATE_KEY }}" | ssh-add -
+            mkdir -p ~/.ssh
+            chmod 700 ~/.ssh
+            echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
             
-            # 配置 Git 使用 SSH
+            # 配置 SSH 主机密钥验证
+            ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+            
+            # 配置 Git 用户信息
             git config --global user.name "Deploy Bot"
             git config --global user.email "deploy@travel-backend"
             
-            # 克隆或更新代码仓库
+            # 克隆或更新代码仓库 - 使用SSH
             if [ -d "/opt/travel-backend/.git" ]; then
               cd /opt/travel-backend
               git pull origin master
@@ -79,8 +84,9 @@ jobs:
             # 拉取最新镜像
             docker pull crpi-aer4k3m8uw2sue3f.cn-hangzhou.personal.cr.aliyuncs.com/dzkdzk/travel:latest
             
-            # 停止旧容器
-            docker-compose down
+            # 停止旧容器（如果存在）
+            cd /opt/travel-backend
+            docker-compose down || true
             
             # 启动新容器
             docker-compose up -d
