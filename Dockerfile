@@ -1,53 +1,53 @@
-# Multi-stage build for GitHub Actions
-FROM eclipse-temurin:17-jdk-alpine AS builder
+# 多阶段构建 - 构建阶段
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
-# Install Maven
-RUN apk add --no-cache maven
-
-# Set working directory
+# 设置工作目录
 WORKDIR /app
 
-# Copy pom.xml and download dependencies
-COPY pom.xml .
-COPY travel-admin/pom.xml travel-admin/
-RUN mvn dependency:go-offline -B
-
-# Copy source code
-COPY . .
-
-# Build the application
-RUN mvn clean package -DskipTests
-
-# Runtime stage
-FROM eclipse-temurin:17-jre-alpine
-
-# Set working directory
-WORKDIR /app
-
-# Set timezone
+# 设置时区
 ENV TZ=Asia/Shanghai
 
-# Install curl for health check
+# 复制 Maven 配置文件
+COPY pom.xml .
+COPY travel-common/pom.xml travel-common/
+COPY travel-web/pom.xml travel-web/
+COPY travel-admin/pom.xml travel-admin/
+
+# 下载依赖（先下载依赖以利用 Docker 缓存）
+RUN mvn dependency:go-offline -B
+
+# 复制源代码
+COPY travel-common/src travel-common/src
+COPY travel-web/src travel-web/src
+COPY travel-admin/src travel-admin/src
+
+# 构建应用
+RUN mvn clean package -DskipTests -B
+
+# 运行阶段 - 使用更轻量的基础镜像
+FROM eclipse-temurin:17-jre-alpine
+
+# 设置工作目录
+WORKDIR /app
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+
+# Alpine使用apk而不是apt-get
 RUN apk add --no-cache curl
 
-# Create upload directory
-RUN mkdir -p /app/uploads
-
-# Set environment variables
+# 设置环境变量
 ENV SPRING_PROFILES_ACTIVE=prod
 
-# Copy the built jar from builder stage
-COPY --from=builder /app/travel-admin/target/travel-admin-0.0.1-SNAPSHOT.jar app.jar
+# 复制构建好的jar文件
+COPY --from=builder /app/travel-admin/target/travel-admin-*.jar app.jar
 
-# Verify the jar file
-RUN jar tf app.jar | head -20
-
-# Expose port
+# 暴露端口
 EXPOSE 8081
 
-# Health check
+# 健康检查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8081/actuator/health || exit 1
 
-# Start application
-CMD ["java", "-jar", "app.jar"]
+# 启动应用
+CMD ["java", "-jar", "app.jar"] 
