@@ -21,8 +21,8 @@ COPY travel-common/src travel-common/src
 COPY travel-web/src travel-web/src
 COPY travel-admin/src travel-admin/src
 
-# 构建应用
-RUN mvn clean package -DskipTests -B
+# 构建应用 - 修复：明确指定要构建的模块
+RUN mvn clean package -pl travel-admin -am -DskipTests -B
 
 # 运行阶段 - 使用更轻量的基础镜像
 FROM eclipse-temurin:17-jre-alpine
