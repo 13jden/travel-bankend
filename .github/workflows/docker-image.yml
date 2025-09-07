@@ -54,7 +54,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             # 创建部署目录
-            mkdir -p /opt/travel-backend
+            mkdir -p /opt/travel-bankend
             
             # 配置 SSH 密钥
             mkdir -p ~/.ssh
@@ -67,15 +67,15 @@ jobs:
             
             # 配置 Git 用户信息
             git config --global user.name "Deploy Bot"
-            git config --global user.email "deploy@travel-backend"
+            git config --global user.email "deploy@travel-bankend"
             
             # 克隆或更新代码仓库 - 使用SSH
-            if [ -d "/opt/travel-backend/.git" ]; then
-              cd /opt/travel-backend
+            if [ -d "/opt/travel-bankend/.git" ]; then
+              cd /opt/travel-bankend
               git pull origin master
             else
-              git clone git@github.com:13jden/travel-backend.git /opt/travel-backend
-              cd /opt/travel-backend
+              git clone git@github.com:13jden/travel-bankend.git /opt/travel-bankend
+              cd /opt/travel-bankend
             fi
             
             # 登录阿里云 ACR
@@ -85,7 +85,7 @@ jobs:
             docker pull crpi-aer4k3m8uw2sue3f.cn-hangzhou.personal.cr.aliyuncs.com/dzkdzk/travel:latest
             
             # 停止旧容器（如果存在）
-            cd /opt/travel-backend
+            cd /opt/travel-bankend
             docker-compose down || true
             
             # 启动新容器
