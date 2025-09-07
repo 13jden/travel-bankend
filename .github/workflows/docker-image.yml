@@ -53,6 +53,10 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
+            # 设置环境变量
+            export MYSQL_ROOT_PASSWORD=123456
+            export MYSQL_PASSWORD=123456
+            
             # 创建部署目录
             mkdir -p /opt/travel-bankend
             
@@ -64,6 +68,10 @@ jobs:
             
             # 配置 SSH 主机密钥验证
             ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+            
+            # 启动 SSH agent 并添加密钥
+            eval "$(ssh-agent -s)"
+            ssh-add ~/.ssh/id_rsa
             
             # 配置 Git 用户信息
             git config --global user.name "Deploy Bot"
