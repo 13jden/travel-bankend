@@ -29,7 +29,7 @@ public class WebSecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 // 允许这些路径无需认证
-                .requestMatchers("/user/login", "/user/register","/chat/**", "/user/autologin", "/checkcode/**").permitAll()
+                .requestMatchers("/user/login", "/user/register","/chat/**", "/user/autologin", "/checkcode/**", "/actuator/health","test/**").permitAll()
                 // admin开头的路径需要ADMIN角色
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // 其他所有请求需要认证
