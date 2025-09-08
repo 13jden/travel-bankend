@@ -17,4 +17,9 @@ public class ChatController {
     public Flux<String> stream(@RequestParam(value = "message", defaultValue = "你好，请问你的知识库文档主要是关于什么内容的?") String message) {
         return chatService.streamChat(message);
     }
+
+    @GetMapping("/test")
+    public String test() {
+        return "test";
+    }
 }

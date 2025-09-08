@@ -6,7 +6,6 @@ import com.alibaba.dashscope.app.ApplicationResult;
 import com.alibaba.dashscope.app.ApplicationOutput;
 import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,26 +23,22 @@ public class ChatService {
      @Value("${spring.ai.dashscope.api-key}")
      String apiKey;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     public Flux<String> streamChat(String prompt) {
         Map<String, String> bizParamMap = new HashMap<>();
         bizParamMap.put("name", "Alice");
         bizParamMap.put("age", "30");
 
-        // 使用ObjectMapper将Map转换为JSON
-        Object bizParams;
-        try {
-            bizParams = objectMapper.convertValue(bizParamMap, Object.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to convert parameters to JSON", e);
+        // 正确地将 Map 转换为 JsonObject
+        JsonObject bizParams = new JsonObject();
+        for (Map.Entry<String, String> entry : bizParamMap.entrySet()) {
+            bizParams.addProperty(entry.getKey(), entry.getValue());
         }
 
         ApplicationParam param = ApplicationParam.builder()
                 .apiKey(apiKey)
                 .appId(appId)
                 .prompt(prompt)
-                .bizParams((JsonObject) bizParams)
+                .bizParams(bizParams)  // 使用正确的 JsonObject
                 .incrementalOutput(true)
                 .hasThoughts(true)
                 .build();
