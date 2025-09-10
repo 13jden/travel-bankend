@@ -1,0 +1,23 @@
+[33m2834eb3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: reset: moving to 2834eb3e6601e07110bbbdad45b19d43b4a1ee5e
+[33ma24b387[m HEAD@{1}: commit: fix:打包找不到主类报错
+[33mcf73a03[m HEAD@{2}: rebase (finish): returning to refs/heads/master
+[33mcf73a03[m HEAD@{3}: rebase (fixup): fix:启动找不到启动类
+[33m9430c2f[m HEAD@{4}: rebase (reword): fix:启动找不到启动类
+[33m33391e8[m HEAD@{5}: rebase: fast-forward
+[33m2834eb3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{6}: rebase (start): checkout 2834eb3e6601e07110bbbdad45b19d43b4a1ee5e
+[33m6b093c1[m HEAD@{7}: commit: fix:启动找不到启动类
+[33m33391e8[m HEAD@{8}: commit: fix:启动找不到启动类
+[33m2834eb3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{9}: commit: fix:构建错误
+[33ma1bc0bc[m HEAD@{10}: commit: fix:服务器后端端口修改
+[33m43eb38b[m HEAD@{11}: commit: fix:服务器CI/CD测试
+[33m12cba09[m HEAD@{12}: commit: fix:docker配置，阿里云镜像
+[33m31abe4b[m HEAD@{13}: commit: feat:docker config 4
+[33mf37e06c[m HEAD@{14}: commit: feat:docker config 3
+[33md060acd[m HEAD@{15}: commit: feat:docker config 2
+[33md1d7942[m HEAD@{16}: commit: feat:docker config 1
+[33m31da5f8[m HEAD@{17}: commit: feat:docker config
+[33me2d2449[m HEAD@{18}: commit: feat:git action config
+[33mb19389d[m HEAD@{19}: pull origin master: Fast-forward
+[33mda894a7[m HEAD@{20}: commit: chore(git): drop previously tracked files now ignored
+[33m4382967[m HEAD@{21}: commit: init
+[33mb5e09fd[m HEAD@{22}: 

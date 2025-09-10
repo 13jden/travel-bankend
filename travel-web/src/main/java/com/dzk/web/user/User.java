@@ -13,7 +13,7 @@ public class User extends BaseEntity {
 
   @TableId(type = IdType.AUTO)
   @Schema(description = "用户ID")
-  private long id;
+  private Long id;
 
 
   @Schema(description = "用户名")

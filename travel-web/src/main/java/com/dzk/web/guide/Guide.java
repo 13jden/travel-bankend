@@ -1,0 +1,58 @@
+package com.dzk.admin.api.guide;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+@Data
+@Schema(description = "攻略实体")
+public class Guide {
+
+  @Schema(description = "攻略ID")
+  @TableId(type = IdType.AUTO)
+  private Long id;
+  
+  @Schema(description = "攻略排序")
+  @TableField(value = "sort")
+  private Integer sort;
+  
+  @Schema(description = "封面图片id (file表id)")
+  @TableField(value = "cover_image_id")
+  private Long coverImageId;
+  
+  @Schema(description = "攻略标题")
+  @TableField(value = "title")
+  private String title;
+  
+  @Schema(description = "攻略类型")
+  @TableField(value = "type")
+  private String type;
+
+  @Schema(description = "是否启用")
+  @TableField(value = "is_enable")
+  private Boolean isEnable;
+
+  @Schema(description = "是否推荐")
+  @TableField(value = "is_recommend")
+  private Boolean isRecommend;
+
+  @Schema(description = "内容(markdown格式)")
+  @TableField(value = "content")
+  private String content;
+
+  @Schema(description = "点击量")
+  @TableField(value = "click_count")
+  private Long clickCount;  
+
+  @Schema(description = "点赞量")
+  @TableField(value = "like_count")
+  private Long likeCount;
+
+  @Schema(description = "收藏量")
+  @TableField(value = "collect_count")
+  private Long collectCount;
+
+}
