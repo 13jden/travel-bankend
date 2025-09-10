@@ -60,6 +60,19 @@ jobs:
             # 创建部署目录
             mkdir -p /opt/travel-bankend
             
+            # 创建文件上传目录
+            mkdir -p /opt/travel/files/temp
+            mkdir -p /opt/travel/files/banner
+            mkdir -p /opt/travel/files/message
+            mkdir -p /opt/travel/files/avatar
+            mkdir -p /opt/travel/files/manuscript/video
+            mkdir -p /opt/travel/files/manuscript/images
+            mkdir -p /opt/travel/files/images
+            mkdir -p /opt/travel/files/knowledge
+            
+            # 设置目录权限
+            chmod -R 755 /opt/travel/files
+            
             # 配置 SSH 密钥
             mkdir -p ~/.ssh
             chmod 700 ~/.ssh
