@@ -14,6 +14,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -52,91 +53,51 @@ public class KnowledgeService {
         return new Client(config);
     }
 
-    /**
-     * 上传文件到知识库
-     */
-    public CompletableFuture<String> uploadFileToKnowledge(MultipartFile file) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                // 1. 申请文件上传凭证
-                ApplyFileUploadLeaseResponseBody.ApplyFileUploadLeaseResponseBodyData leaseData = 
-                    applyFileUploadLease(file);
-                
-                if (leaseData == null) {
-                    throw new RuntimeException("申请文件上传凭证失败");
-                }
-
-                // 2. 上传文件
-                Map<String, String> headers = (Map<String, String>) leaseData.getParam().getHeaders();
-                String extra = headers != null ? headers.get("X-bailian-extra") : "";
-                String contentType = headers != null ? headers.get("Content-Type") : "application/octet-stream";
-                
-                uploadFile(leaseData.getParam().getUrl(), file, extra, contentType);
-
-                // 3. 添加文件到知识库
-                AddFileResponseBody.AddFileResponseBodyData fileData = 
-                    addFile(leaseData.getFileUploadLeaseId());
-                
-                if (fileData == null) {
-                    throw new RuntimeException("添加文件到知识库失败");
-                }
-
-                // 4. 等待文件处理完成
-                String status = waitForFileProcessing(fileData.getFileId());
-                
-                if (!"PARSE_SUCCESS".equalsIgnoreCase(status)) {
-                    throw new RuntimeException("文件处理失败，状态: " + status);
-                }
-
-                // 5. 提交文档切割任务
-                submitIndexAddDocumentsJob(fileData.getFileId());
-
-                return "文件上传成功，文件ID: " + fileData.getFileId();
-                
-            } catch (Exception e) {
-                throw new RuntimeException("文件上传失败: " + e.getMessage(), e);
-            }
-        });
-    }
+    
 
     /**
-     * 申请文件上传凭证
+     * 申请文档上传租约。
+     *
+     * @param client      客户端对象
+     * @param categoryId  类目ID
+     * @param fileName    文档名称
+     * @param fileMd5     文档的MD5值
+     * @param fileSize    文档大小（以字节为单位）
+     * @param workspaceId 业务空间ID
+     * @return 阿里云百炼服务的响应对象
      */
-    private ApplyFileUploadLeaseResponseBody.ApplyFileUploadLeaseResponseBodyData applyFileUploadLease(MultipartFile file) throws Exception {
-        Client client = createClient();
-        ApplyFileUploadLeaseRequest request = new ApplyFileUploadLeaseRequest();
-        request.setFileName(file.getOriginalFilename());
-        request.setMd5(calculateMD5(file));
-        request.setSizeInBytes(String.valueOf(file.getSize()));
-        // request.setCategoryType("UNSTRUCTURED"); // 该方法不存在，已注释
-
-        RuntimeOptions runtime = new RuntimeOptions();
+    public ApplyFileUploadLeaseResponse applyLease(com.aliyun.bailian20231229.Client client, String categoryId, String fileName, String fileMd5, String fileSize, String workspaceId) throws Exception {
         Map<String, String> headers = new HashMap<>();
-
-        try {
-            ApplyFileUploadLeaseResponse response = client.applyFileUploadLeaseWithOptions(
-                categoryId, workspaceId, request, headers, runtime);
-            return response.getBody().getData();
-        } catch (Exception e) {
-            throw new RuntimeException("申请文件上传凭证失败: " + e.getMessage(), e);
-        }
+        com.aliyun.bailian20231229.models.ApplyFileUploadLeaseRequest applyFileUploadLeaseRequest = new com.aliyun.bailian20231229.models.ApplyFileUploadLeaseRequest();
+        applyFileUploadLeaseRequest.setFileName(fileName);
+        applyFileUploadLeaseRequest.setMd5(fileMd5);
+        applyFileUploadLeaseRequest.setSizeInBytes(fileSize);
+        com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
+        ApplyFileUploadLeaseResponse applyFileUploadLeaseResponse = null;
+        applyFileUploadLeaseResponse = client.applyFileUploadLeaseWithOptions(categoryId, workspaceId, applyFileUploadLeaseRequest, headers, runtime);
+        return applyFileUploadLeaseResponse;
     }
 
     /**
-     * 上传文件
+     * 上传到临时存储
+     * @param preSignedUrl  上面接口实际返回的Data.Param.Headers中X-bailian-extra字段的值
+     * @param filePath   实际返回的Data.Param.Headers中Content-Type字段的值（返回空值时，传空值即可）
      */
-    private void uploadFile(String preSignedUrl, MultipartFile file, String extra, String contentType) throws Exception {
+    public static void uploadFile(String preSignedUrl, String filePath) {
         HttpURLConnection connection = null;
         try {
+            // 创建URL对象
             URL url = new URL(preSignedUrl);
             connection = (HttpURLConnection) url.openConnection();
+            // 设置请求方法用于文档上传，需与您在上一步中调用ApplyFileUploadLease接口实际返回的Data.Param中Method字段的值一致
             connection.setRequestMethod("PUT");
+            // 允许向connection输出，因为这个连接是用于上传文档的
             connection.setDoOutput(true);
-            connection.setRequestProperty("X-bailian-extra", extra != null ? extra : "");
-            connection.setRequestProperty("Content-Type", contentType != null ? contentType : "application/octet-stream");
-
+            connection.setRequestProperty("X-bailian-extra", "请替换为您在上一步中调用ApplyFileUploadLease接口实际返回的Data.Param.Headers中X-bailian-extra字段的值");
+            connection.setRequestProperty("Content-Type", "请替换为您在上一步中调用ApplyFileUploadLease接口实际返回的Data.Param.Headers中Content-Type字段的值（返回空值时，传空值即可）");
+            // 读取文档并通过连接上传
             try (DataOutputStream outStream = new DataOutputStream(connection.getOutputStream());
-                 InputStream fileInputStream = file.getInputStream()) {
+                 FileInputStream fileInputStream = new FileInputStream(filePath)) {
                 byte[] buffer = new byte[4096];
                 int bytesRead;
                 while ((bytesRead = fileInputStream.read(buffer)) != -1) {
@@ -144,11 +105,17 @@ public class KnowledgeService {
                 }
                 outStream.flush();
             }
-
+            // 检查响应
             int responseCode = connection.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
-                throw new RuntimeException("文件上传失败，响应码: " + responseCode);
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // 文档上传成功处理
+                System.out.println("File uploaded successfully.");
+            } else {
+                // 文档上传失败处理
+                System.out.println("Failed to upload the file. ResponseCode: " + responseCode);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -157,151 +124,91 @@ public class KnowledgeService {
     }
 
     /**
-     * 添加文件到知识库
+     * 将文档添加到类目中。
+     *
+     * @param client      客户端对象
+     * @param leaseId     租约ID
+     * @param parser      用于文档的解析器
+     * @param categoryId  类目ID
+     * @param workspaceId 业务空间ID
+     * @return 阿里云百炼服务的响应对象
      */
-    private AddFileResponseBody.AddFileResponseBodyData addFile(String leaseId) throws Exception {
-        Client client = createClient();
-        AddFileRequest request = new AddFileRequest();
-        request.setCategoryId(categoryId);
-        request.setLeaseId(leaseId);
-        request.setParser("DASHSCOPE_DOCMIND");
-
-        RuntimeOptions runtime = new RuntimeOptions();
+    public AddFileResponse addFile(com.aliyun.bailian20231229.Client client, String leaseId, String parser, String categoryId, String workspaceId) throws Exception {
         Map<String, String> headers = new HashMap<>();
-
-        try {
-            AddFileResponse response = client.addFileWithOptions(workspaceId, request, headers, runtime);
-            return response.getBody().getData();
-        } catch (Exception e) {
-            throw new RuntimeException("添加文件到知识库失败: " + e.getMessage(), e);
-        }
+        com.aliyun.bailian20231229.models.AddFileRequest addFileRequest = new com.aliyun.bailian20231229.models.AddFileRequest();
+        addFileRequest.setLeaseId(leaseId);
+        addFileRequest.setParser(parser);
+        addFileRequest.setCategoryId(categoryId);
+        com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
+        return client.addFileWithOptions(workspaceId, addFileRequest, headers, runtime);
     }
 
     /**
-     * 等待文件处理完成
+     * 查询文档的基本信息。
+     *
+     * @param client      客户端对象
+     * @param workspaceId 业务空间ID
+     * @param fileId      文档ID
+     * @return 阿里云百炼服务的响应对象
      */
-    private String waitForFileProcessing(String fileId) throws Exception {
-        String status = null;
-        int maxAttempts = 30; // 最多等待5分钟
-        int attempt = 0;
-        
-        while (attempt < maxAttempts) {
-            status = getFileStatus(fileId);
-            if (status != null && "PARSE_SUCCESS".equalsIgnoreCase(status)) {
-                break;
-            } else if (status != null && "PARSE_FAILED".equalsIgnoreCase(status)) {
-                throw new RuntimeException("文件解析失败");
-            }
-            
-            Thread.sleep(10000); // 等待10秒
-            attempt++;
-        }
-        
-        if (attempt >= maxAttempts) {
-            throw new RuntimeException("文件处理超时");
-        }
-        
-        return status;
-    }
-
-    /**
-     * 获取文件状态
-     */
-    private String getFileStatus(String fileId) throws Exception {
-        Client client = createClient();
-        RuntimeOptions runtime = new RuntimeOptions();
+    public DescribeFileResponse describeFile(com.aliyun.bailian20231229.Client client, String workspaceId, String fileId) throws Exception {
         Map<String, String> headers = new HashMap<>();
-
-        try {
-            DescribeFileResponse response = client.describeFileWithOptions(workspaceId, fileId, headers, runtime);
-            Object status = response.getBody().getData().getStatus();
-            return status != null ? status.toString() : "UNKNOWN";
-        } catch (Exception e) {
-            throw new RuntimeException("获取文件状态失败: " + e.getMessage(), e);
-        }
+        com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
+        return client.describeFileWithOptions(workspaceId, fileId, headers, runtime);
     }
 
     /**
-     * 提交文档切割任务
+     * 向阿里云百炼服务提交索引任务。
+     *
+     * @param client      客户端对象
+     * @param workspaceId 业务空间ID
+     * @param indexId     知识库ID
+     * @return 阿里云百炼服务的响应对象
      */
-    private void submitIndexAddDocumentsJob(String fileId) throws Exception {
-        Client client = createClient();
-        // 暂时注释掉，因为相关类可能不存在
-        // SubmitIndexAddDocumentsJobRequest request = new SubmitIndexAddDocumentsJobRequest();
-        RuntimeOptions runtime = new RuntimeOptions();
+    public SubmitIndexJobResponse submitIndex(com.aliyun.bailian20231229.Client client, String workspaceId, String indexId) throws Exception {
         Map<String, String> headers = new HashMap<>();
-
-        try {
-            // 暂时注释掉相关代码
-            // request.setDocumentIds(Arrays.asList(fileId));
-            // request.setSourceType("DATA_CENTER_FILE");
-            // request.setIndexId(indexId);
-            // request.setChunkMode("h1");
-            // request.setChunkSize(6000);
-
-            // SubmitIndexAddDocumentsJobResponse response = client.submitIndexAddDocumentsJobWithOptions(
-            //     workspaceId, request, headers, runtime);
-            
-            System.out.println("文档切割任务提交成功，文件ID: " + fileId);
-        } catch (Exception e) {
-            throw new RuntimeException("提交文档切割任务失败: " + e.getMessage(), e);
-        }
+        com.aliyun.bailian20231229.models.SubmitIndexJobRequest submitIndexJobRequest = new com.aliyun.bailian20231229.models.SubmitIndexJobRequest();
+        submitIndexJobRequest.setIndexId(indexId);
+        com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
+        return client.submitIndexJobWithOptions(workspaceId, submitIndexJobRequest, headers, runtime);
     }
 
     /**
-     * 删除知识库索引
+     * 查询索引任务状态。
+     *
+     * @param client      客户端对象
+     * @param workspaceId 业务空间ID
+     * @param jobId       任务ID
+     * @param indexId     知识库ID
+     * @return 阿里云百炼服务的响应对象
      */
-    public String deleteKnowledgeIndex() {
-        try {
-//            // 暂时注释掉 Elasticsearch 相关代码，因为与阿里云百炼客户端不兼容
-//             Client client = createClient();
-//             DeleteIndexRequest request = new DeleteIndexRequest();
-//             RuntimeOptions runtime = new RuntimeOptions();
-//             Map<String, String> headers = new HashMap<>();
-//
-//             DeleteIndexResponse response = client.deleteIndexWithOptions(workspaceId, indexId, request, headers, runtime);
-            return "知识库删除功能暂时不可用";
-        } catch (Exception e) {
-            throw new RuntimeException("删除知识库失败: " + e.getMessage(), e);
-        }
+    public GetIndexJobStatusResponse getIndexJobStatus(com.aliyun.bailian20231229.Client client, String workspaceId, String jobId, String indexId) throws Exception {
+        Map<String, String> headers = new HashMap<>();
+        com.aliyun.bailian20231229.models.GetIndexJobStatusRequest getIndexJobStatusRequest = new com.aliyun.bailian20231229.models.GetIndexJobStatusRequest();
+        getIndexJobStatusRequest.setIndexId(indexId);
+        getIndexJobStatusRequest.setJobId(jobId);
+        com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
+        GetIndexJobStatusResponse getIndexJobStatusResponse = null;
+        getIndexJobStatusResponse = client.getIndexJobStatusWithOptions(workspaceId, getIndexJobStatusRequest, headers, runtime);
+        return getIndexJobStatusResponse;
     }
 
     /**
-     * 计算文件MD5
+     * 从指定的非结构化知识库中永久删除一个或多个文档
+     *
+     * @param client      客户端（Client）
+     * @param workspaceId 业务空间ID
+     * @param indexId     知识库ID
+     * @param fileId      文档ID
+     * @return 阿里云百炼服务的响应
      */
-    private String calculateMD5(MultipartFile file) throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("MD5");
-        try (InputStream fis = file.getInputStream()) {
-            byte[] buffer = new byte[8192];
-            int bytesRead;
-            while ((bytesRead = fis.read(buffer)) != -1) {
-                digest.update(buffer, 0, bytesRead);
-            }
-        }
-        
-        byte[] md5Bytes = digest.digest();
-        StringBuilder sb = new StringBuilder();
-        for (byte b : md5Bytes) {
-            sb.append(String.format("%02x", b));
-        }
-        return sb.toString();
+    public DeleteIndexDocumentResponse deleteIndexDocument(com.aliyun.bailian20231229.Client client, String workspaceId, String indexId, String fileId) throws Exception {
+        Map<String, String> headers = new HashMap<>();
+        DeleteIndexDocumentRequest deleteIndexDocumentRequest = new DeleteIndexDocumentRequest();
+        deleteIndexDocumentRequest.setIndexId(indexId);
+        deleteIndexDocumentRequest.setDocumentIds(Collections.singletonList(fileId));
+        com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
+        return client.deleteIndexDocumentWithOptions(workspaceId, deleteIndexDocumentRequest, headers, runtime);
     }
 
-    /**
-     * 获取知识库信息
-     */
-    public String getKnowledgeIndexInfo() {
-        try {
-            // 暂时注释掉相关代码，因为相关类可能不存在
-            // Client client = createClient();
-            // DescribeIndexRequest request = new DescribeIndexRequest();
-            // RuntimeOptions runtime = new RuntimeOptions();
-            // Map<String, String> headers = new HashMap<>();
-
-            // DescribeIndexResponse response = client.describeIndexWithOptions(workspaceId, indexId, request, headers, runtime);
-            return "知识库信息获取功能暂时不可用";
-        } catch (Exception e) {
-            throw new RuntimeException("获取知识库信息失败: " + e.getMessage(), e);
-        }
-    }
 } 
