@@ -1,14 +1,8 @@
 package com.dzk.admin.api.knowledge;
 
-import com.dzk.web.Agent.knowledge.KnowledgeService;
+import com.dzk.web.api.Agent.knowledge.KnowledgeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.Map;
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/knowledge")
