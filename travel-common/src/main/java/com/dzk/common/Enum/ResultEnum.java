@@ -49,7 +49,9 @@ public enum ResultEnum {
 
     PERMISSION_TOKEN_INVALID(70006, "无效token"),
 
-    PERMISSION_SIGNATURE_ERROR(70007, "签名失败");
+    PERMISSION_SIGNATURE_ERROR(70007, "签名失败"),
+
+    BUSINESS_ERROR(90001, "业务异常");
 
     // 状态码
     int code;

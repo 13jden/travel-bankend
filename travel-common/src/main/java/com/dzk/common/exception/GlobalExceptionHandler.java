@@ -4,16 +4,18 @@ import com.dzk.common.Enum.ResultEnum;
 import com.dzk.common.common.Result;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.stream.Collectors;
 
-@ControllerAdvice
+@RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -24,7 +26,8 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.joining(", "));
-        return Result.error("请求参数错误");
+        log.error("请求参数错误: {}", errorMessage);
+        return Result.error(ResultEnum.PARAM_IS_INVALID.getMessage());
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -32,20 +35,23 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Result handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
         String errorMessage = "请求参数错误";
-        return Result.error(errorMessage);
+        log.error("请求参数错误: {}", errorMessage);
+        return Result.error(ResultEnum.PARAM_IS_INVALID.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
     public Result handleIllegalArgumentException(IllegalArgumentException ex) {
-        return Result.error(ex.getMessage());
+        log.error("请求参数错误: {}", ex.getMessage());
+        return Result.error(ResultEnum.PARAM_IS_INVALID.getMessage());
     }
 
     @ExceptionHandler(LoginTimeoutException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
     public Result handleLoginTimeoutException(LoginTimeoutException ex) {
+        log.error("登录超时: {}", ex.getMessage());
         return Result.error(ResultEnum.PERMISSION_EXPIRE.getMessage());
     }
 
@@ -53,6 +59,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Result handleBusinessException(BusinessException ex) {
-        return Result.error(ex.getCode(), ex.getMessage());
+        log.error("业务异常: {}", ex.getMessage());
+        return Result.error(ResultEnum.BUSINESS_ERROR.code(),ex.getMessage());
     }
 }

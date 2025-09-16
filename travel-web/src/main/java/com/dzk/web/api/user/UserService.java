@@ -1,18 +1,17 @@
 package com.dzk.web.api.user;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzk.common.redis.RedisComponent;
+
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
+public class UserService  extends ServiceImpl<UserMapper, User> {
 
     @Autowired
     private UserMapper userMapper;
-    
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
+
     
     @Autowired
     private UserConverter userConverter;
@@ -28,7 +27,11 @@ public class UserService {
         int result = userMapper.insert(user);
         return userMapper.getUserByOpenId(user.getOpenId());
     }
-    
+
+    public User getUserByUserName(String username){
+        return userMapper.getUserByUsername(username);
+    }
+
     public UserDto login(String username, String password, String checkCode, String captchaKey) {
         // 验证验证码
         if (!validateCheckCode(captchaKey, checkCode)) {

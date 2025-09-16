@@ -100,6 +100,20 @@
             <artifactId>fastjson2</artifactId>
             <version>2.0.43</version>
         </dependency>
+
+        <!-- 验证码 -->
+        <dependency>
+            <groupId>com.github.whvcse</groupId>
+            <artifactId>easy-captcha</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.dzk</groupId>
+            <artifactId>travel-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

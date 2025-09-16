@@ -10,10 +10,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.List;
 import java.util.Map;
 
 @RestController
+@Tag(name = "BannerManagerController", description = "Banner管理")
 public class BannerManagerController {
 
     @Autowired

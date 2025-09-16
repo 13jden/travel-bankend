@@ -1,4 +1,4 @@
-package com.dzk.admin.config;
+package com.dzk.web.config;
 
 import com.dzk.common.redis.RedisComponent;
 import com.dzk.web.utils.JwtUtil;

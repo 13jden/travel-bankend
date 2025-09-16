@@ -1,6 +1,5 @@
-package com.dzk.admin.config;
+package com.dzk.web.config;
 
-import com.dzk.common.config.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -29,7 +28,15 @@ public class WebSecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 // 允许这些路径无需认证
-                .requestMatchers("/user/login", "/user/register","/chat/**", "/user/autologin", "/checkcode/**", "/actuator/health","test/**").permitAll()
+                .requestMatchers(
+//                    "/user/login",
+//                    "/user/register",
+//                    "/api/**",   // 放行所有 auth 相关接口
+//                    "/user/autologin",
+//                    "/checkcode/**",
+//                    "/actuator/health",
+                    "/**"
+                ).permitAll()
                 // admin开头的路径需要ADMIN角色
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // 其他所有请求需要认证

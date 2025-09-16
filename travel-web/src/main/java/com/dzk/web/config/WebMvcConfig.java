@@ -1,4 +1,4 @@
-package com.dzk.admin.config;
+package com.dzk.web.config;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,20 +13,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(jwtInterceptor)
-//                .addPathPatterns("/**")  // 拦截所有请求
-//                .excludePathPatterns("/user/login")
-//                .excludePathPatterns("/user/register")
-//                .excludePathPatterns("/user/autologin")
-//                .excludePathPatterns("/checkcode")
-//                .excludePathPatterns("/ws")
-//                .excludePathPatterns("/message/**")
-//                .excludePathPatterns("/images/**")  // 排除所有静态资源
-//                .excludePathPatterns("/files/**");  // 排除所有静态资源
-//
-//    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

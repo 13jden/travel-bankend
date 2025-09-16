@@ -1,5 +1,9 @@
-package com.dzk.common.config;
+package com.dzk.web.config;
 
+import com.dzk.common.constants.Constants;
+import com.dzk.common.redis.RedisComponent;
+import com.dzk.web.api.user.User;
+import com.dzk.web.api.auth.TokenUserDto;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -9,6 +13,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +31,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
 
+    @Autowired
+    private RedisComponent redisComponent;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -33,17 +42,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = extractTokenFromRequest(request);
             
             if (token != null && validateToken(token)) {
-                JWTClaimsSet claims = getClaimsFromToken(token);
-                String username = claims.getSubject();
-                List<String> roles = claims.getStringListClaim("roles");
+                // 从Redis获取用户信息
+                TokenUserDto tokenUserDto = redisComponent.getUserToken(Constants.REDIS_KEY_TOKEN_WEB + token);
                 
-                if (username != null && roles != null) {
-                    List<SimpleGrantedAuthority> authorities = roles.stream()
-                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                            .collect(Collectors.toList());
+                if (tokenUserDto != null) {
+                    // 创建用户对象
+                    User user = new User();
+                    user.setId(tokenUserDto.getId());
+                    user.setUsername(tokenUserDto.getUsername());
+                    user.setNickname(tokenUserDto.getNickname());
+                    user.setAvatar(tokenUserDto.getAvatar());
+                    // 设置其他需要的用户属性
                     
+                    // 创建认证对象，存储完整的用户信息
                     UsernamePasswordAuthenticationToken authentication = 
-                            new UsernamePasswordAuthenticationToken(username, null, authorities);
+                        new UsernamePasswordAuthenticationToken(
+                            user,  // 存储完整的用户对象
+                            null,  // 密码设为null
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                        );
                     
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }

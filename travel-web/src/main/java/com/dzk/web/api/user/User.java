@@ -25,6 +25,12 @@ public class User extends BaseEntity {
   @Schema(description = "头像")
   private String avatar;
 
+  @Schema(description = "昵称")
+  private String nickname;
+
+  @Schema(description = "电话号码")
+  private String phone;
+
   @Schema(description = "密码")
   private String password;
 
