@@ -46,8 +46,8 @@ COPY --from=builder /app/travel-admin/target/travel-admin-*.jar app.jar
 EXPOSE 8081
 
 # 健康检查
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8081/actuator/health || exit 1
+#HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+#    CMD curl -f http://localhost:8081/actuator/health || exit 1
 
 # 启动应用 - 使用jar文件启动
 CMD ["java", "-jar", "app.jar"]
