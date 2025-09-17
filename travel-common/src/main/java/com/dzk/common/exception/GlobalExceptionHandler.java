@@ -62,4 +62,12 @@ public class GlobalExceptionHandler {
         log.error("业务异常: {}", ex.getMessage());
         return Result.error(ResultEnum.BUSINESS_ERROR.code(),ex.getMessage());
     }
+
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Result handleValidationException(ValidationException ex) {
+        log.error("校验异常: {}", ex.getMessage());
+        return Result.error(ResultEnum.BUSINESS_ERROR.code(),ex.getMessage());
+    }
 }
