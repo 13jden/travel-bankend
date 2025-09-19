@@ -13,21 +13,7 @@
     <artifactId>travel-web</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>web</name>
-    <description>Demo project for Spring Boot</description>
 
-    <url/>
-    <licenses>
-        <license/>
-    </licenses>
-    <developers>
-        <developer/>
-    </developers>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
     <properties>
         <java.version>17</java.version>
     </properties>
@@ -41,17 +27,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.dzk</groupId>
-            <artifactId>travel-common</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>co.elastic.clients</groupId>
-            <artifactId>elasticsearch-java</artifactId>
-            <version>8.13.4</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -80,20 +55,6 @@
             <version>1.4.1</version>
         </dependency>
         
-        <!-- 阿里云Tea SDK -->
-        <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>tea-openapi</artifactId>
-            <version>0.3.1</version>
-        </dependency>
-        
-        <!-- 阿里云Tea Util -->
-        <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>tea-util</artifactId>
-            <version>0.2.21</version>
-        </dependency>
-        
         <!-- FastJSON2 -->
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
@@ -113,6 +74,10 @@
             <artifactId>travel-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
         </dependency>
     </dependencies>
 

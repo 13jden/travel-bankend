@@ -11,8 +11,8 @@ import com.wf.captcha.ChineseGifCaptcha;
 import com.wf.captcha.GifCaptcha;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
+import io.micrometer.common.util.StringUtils;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.context.annotation.Configuration;
 

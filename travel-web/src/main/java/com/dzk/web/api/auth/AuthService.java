@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.dzk.web.api.auth.captcha.CaptchaDto;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,6 +41,9 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Value("${app.captcha-enabled:true}")
 	private boolean captchaEnabled;
 
@@ -58,7 +62,8 @@ public class AuthService {
         if(user == null){
             throw new BusinessException("用户不存在");
         }
-        if(!user.getPassword().equals(request.getPassword())){
+//        String password = passwordEncoder.encode(request.getPassword());
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
             throw new BusinessException("用户名或密码错误");
         }
         
