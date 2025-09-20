@@ -9,25 +9,29 @@ import lombok.Data;
 import com.dzk.common.common.BaseEntity;
 
 @Data
-public class File extends BaseEntity {
+public class FileEntity extends BaseEntity {
 
     @TableId(type = IdType.AUTO)
     @Schema(description = "文件id")
     private Long id;
     
-    @TableField(value = "url")
-    @Schema(description = "文件url")
-    private String url;
+    @TableField(value = "uuid")
+    @Schema(description = "文件uuid")
+    private String uuid;
+    
+    @TableField(value = "path")
+    @Schema(description = "文件路径")
+    private String path;
 
     @TableField(value = "type")
     @Schema(description = "文件类型")
     private String type;
 
+    @TableField(value = "extension")
+    @Schema(description = "文件扩展名")
+    private String extension;
+
     @TableField(value = "size")
     @Schema(description = "文件大小")
     private Long size;
-
-    @TableField(value = "name")
-    @Schema(description = "文件名称")
-    private String name;
 }

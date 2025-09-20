@@ -36,9 +36,11 @@ services:
       MYSQL_CHARSET: utf8mb4
       MYSQL_COLLATION: utf8mb4_unicode_ci
     volumes:
+      # 使用命名卷持久化数据
       - mysql_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./mysql/conf.d:/etc/mysql/conf.d
+      # 只在初始化时挂载 init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./mysql/conf.d:/etc/mysql/conf.d:ro
     ports:
       - "3306:3306"
     networks:
@@ -49,6 +51,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    # 添加命令确保数据持久化
+    command: --default-authentication-plugin=mysql_native_password
 
   redis:
     image: redis:7-alpine
@@ -58,7 +62,7 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     networks:
       - travel-network
     healthcheck:
@@ -75,4 +79,6 @@ networks:
 
 volumes:
   mysql_data:
-  redis_data: 
+    driver: local
+  redis_data:
+    driver: local 

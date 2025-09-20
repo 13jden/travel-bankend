@@ -141,12 +141,7 @@ public class BannerService{
          * @return 确认结果
          */
         public boolean confirmImage(String fileName) {
-
-            // 规范化临时文件路径
-//        String normalizedTempPath = tempPath.replace('\\', '/').replace("//", "/");
-//        String normalizedFileName = fileName.replace('\\', '/');
-
-
+            
             // 使用 Paths.get 来正确处理路径
             File tempFile = Paths.get(tempPath, fileName).toFile();
 

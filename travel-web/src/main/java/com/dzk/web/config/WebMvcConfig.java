@@ -2,6 +2,7 @@ package com.dzk.web.config;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -13,26 +14,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
+    @Value("${file.common.path}")
+    private String commonPath;
+
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/images/temp/**")
-                .addResourceLocations("file:D:/IdousoFile/temp/");
-
-        registry.addResourceHandler("/images/banner/**")
-                .addResourceLocations("file:D:/IdousoFile/banner/");
-
-        registry.addResourceHandler("/images/avatar/**")
-                .addResourceLocations("file:D:/IdousoFile/avatar/");
-
-        registry.addResourceHandler("/video/**")
-                .addResourceLocations("file:D:/IdousoFile/manuscript/video/");
-        registry.addResourceHandler("/images/manuscript/**")
-                .addResourceLocations("file:D:/IdousoFile/manuscript/images/");
-        registry.addResourceHandler("/images/comment/**")
-                .addResourceLocations("file:D:/IdousoFile/comment/");
-        registry.addResourceHandler("/files/message/**")
-                .addResourceLocations("file:D:/IdousoFile/message/");
+        registry.addResourceHandler("/files/**")
+                .addResourceLocations("file:" + commonPath);
     }
 
     @Override
