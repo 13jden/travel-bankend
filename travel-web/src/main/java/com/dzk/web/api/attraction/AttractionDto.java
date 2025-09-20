@@ -18,8 +18,17 @@ public class AttractionDto {
     @Schema(description = "景点标题")
     private String title;
 
+    @Schema(description = "景点英文标题")
+    private String titleEn;
+
     @Schema(description = "景点描述")
     private String description;
+
+    @Schema(description = "景点英文描述")
+    private String descriptionEn;
+
+    @Schema(description = "景点排序")
+    private Integer sort;
 
     @Schema(description = "景点封面图片id")
     private Long coverImageId;
@@ -28,21 +37,23 @@ public class AttractionDto {
     private Boolean isEnable;
 
     @Schema(description = "景点内容")
-    private String content; 
+    private String content;
+
+    @Schema(description = "景点英文内容")
+    private String contentEn;
 
     @Data
     @Schema(description = "景点输入数据传输对象")
     public static class Input {
-        @Schema(description = "景点id")
-        private Long id;
+
         @Schema(description = "景点标题")
         private String title;
 
-        @Schema(description = "景点描述")
-        private String description;
-
         @Schema(description = "景点英文标题")
         private String titleEn;
+
+        @Schema(description = "景点描述")
+        private String description;
 
         @Schema(description = "景点英文描述")
         private String descriptionEn;
@@ -52,6 +63,9 @@ public class AttractionDto {
 
         @Schema(description = "景点英文内容")
         private String contentEn;
+
+        @Schema(description = "景点排序")
+        private Integer sort;
 
         @Schema(description = "景点封面图片id")
         private Long coverImageId;

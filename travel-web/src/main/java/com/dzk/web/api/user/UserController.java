@@ -19,7 +19,6 @@ public class UserController {
     @Autowired
     private RedisComponent redisComponent;
 
-    @Value("${upload.avatar}")
-    private String avatarPath;
+
 
 }

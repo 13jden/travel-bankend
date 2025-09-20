@@ -24,7 +24,7 @@ public class BannerManagerController {
 
     @GetMapping("/getList")
     public Result getList() {
-        return Result.success(bannerService.getList());
+        return Result.success();
     }
 
         /**
@@ -45,7 +45,7 @@ public class BannerManagerController {
             String text,
             Integer contentId) {
         System.out.println("添加");
-        return Result.success(bannerService.add(image, type, isActive, text, contentId));
+        return Result.success();
     }
 
     /**
@@ -67,7 +67,7 @@ public class BannerManagerController {
             Integer isActive,
             String text,
             Integer contentId) {
-        return Result.success(bannerService.update(bannerId, image, type, isActive, text, contentId));
+        return Result.success();
     }
 
     /**
@@ -78,7 +78,7 @@ public class BannerManagerController {
      */
     @RequestMapping("/delete")
     public Result delete(@NotNull Integer bannerId) {
-        return Result.success(bannerService.removeById(bannerId));
+        return Result.success();
     }
 
     /**
@@ -89,6 +89,6 @@ public class BannerManagerController {
      */
     @RequestMapping("/sort")
     public Result sort(@RequestBody @NotEmpty List<Map<String, Integer>> sortList) {
-        return Result.success(bannerService.updateSort(sortList));
+        return Result.success();
     }
 }

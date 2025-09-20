@@ -14,7 +14,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
-    @Value("${file.common.path}")
+    @Value("${upload.commonPath}")
     private String commonPath;
 
 

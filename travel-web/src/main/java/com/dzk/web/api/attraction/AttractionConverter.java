@@ -4,44 +4,64 @@ import com.dzk.web.utils.SecurityUtil;
 import com.dzk.web.api.user.User;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class AttractionConverter {
 
-    public AttractionDto toDto(Attraction attraction) {
-        User.Language language = SecurityUtil.getCurrentUser().getLanguage();
-        String title;
-        String description;
-        String content;
-        if(language == User.Language.EN_US) {
-            title = attraction.getTitleEn();
-            description = attraction.getDescriptionEn();
-            content = attraction.getContentEn();
-        } else {
-            title = attraction.getTitle();
-            description = attraction.getDescription();
-            content = attraction.getContent();
+    /**
+     * 实体转DTO
+     */
+    public static AttractionDto toDto(Attraction attraction) {
+        if (attraction == null) {
+            return null;
         }
         
         return AttractionDto.builder()
-            .id(attraction.getId())
-            .title(title)
-            .description(description)
-            .content(content)
-            .coverImageId(attraction.getCoverImageId())
-            .isEnable(attraction.getIsEnable())
-            .build();
+                .id(attraction.getId())
+                .title(attraction.getTitle())
+                .titleEn(attraction.getTitleEn())
+                .description(attraction.getDescription())
+                .descriptionEn(attraction.getDescriptionEn())
+                .sort(attraction.getSort())
+                .coverImageId(attraction.getCoverImageId())
+                .isEnable(attraction.getIsEnable())
+                .content(attraction.getContent())
+                .contentEn(attraction.getContentEn())
+                .build();
     }
-
-    public Attraction toEntity(AttractionDto.Input attractionDto) {
+    
+    /**
+     * 实体列表转DTO列表
+     */
+    public static List<AttractionDto> toDtoList(List<Attraction> attractions) {
+        if (attractions == null) {
+            return null;
+        }
+        
+        return attractions.stream()
+                .map(AttractionConverter::toDto)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 输入DTO转实体
+     */
+    public static Attraction toEntity(AttractionDto.Input input) {
+        if (input == null) {
+            return null;
+        }
+        
         return Attraction.builder()
-            .id(attractionDto.getId())
-            .title(attractionDto.getTitle())
-            .titleEn(attractionDto.getTitleEn())
-            .description(attractionDto.getDescription())
-            .descriptionEn(attractionDto.getDescriptionEn())
-            .coverImageId(attractionDto.getCoverImageId())
-            .isEnable(attractionDto.getIsEnable())
-            .content(attractionDto.getContent())
-            .build();
+                .title(input.getTitle())
+                .titleEn(input.getTitleEn())
+                .description(input.getDescription())
+                .descriptionEn(input.getDescriptionEn())
+                .content(input.getContent())
+                .contentEn(input.getContentEn())
+                .coverImageId(input.getCoverImageId())
+                .isEnable(input.getIsEnable())
+                .build();
     }
 }   

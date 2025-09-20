@@ -21,7 +21,7 @@ public class BannerController {
      */
     @RequestMapping("/getList")
     public Result getList() {
-        return Result.success(bannerService.getList());
+        return Result.success();
     }
 
 }
