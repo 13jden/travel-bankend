@@ -15,8 +15,11 @@ public class BannerDto {
     @Schema(description = "banner 描述")
     private String description;
 
-    @Schema(description = "banner 图片id")
-    private Long imageId;
+    @Schema(description = "图片文件id")
+    private Long fileId;
+
+    @Schema(description = "图片uuid")
+    private Long uuid;
 
     @Schema(description = "banner 是否启用")
     private Boolean isEnable;

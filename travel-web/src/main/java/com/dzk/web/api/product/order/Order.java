@@ -3,14 +3,22 @@ package com.dzk.web.api.product.order;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.Builder;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import com.dzk.common.common.BaseEntity;
 
 import java.math.BigDecimal;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@TableName("product_order")
 public class Order extends BaseEntity {
 
     @TableId(type = IdType.AUTO)
@@ -19,11 +27,11 @@ public class Order extends BaseEntity {
 
     @TableField(value = "user_id")
     @Schema(description = "用户id")
-    private String userId;
+    private Long userId;
     
     @TableField(value = "product_id")
     @Schema(description = "文创产品id")
-    private String productId;
+    private Long productId;
 
     @TableField(value = "quantity")
     @Schema(description = "数量")
@@ -47,15 +55,9 @@ public class Order extends BaseEntity {
 
     @TableField(value = "status")
     @Schema(description = "状态")
-    private OrderStatus status;
+    private String status;
     
-    enum OrderStatus {
-        PENDING, // 待付款
-        PAID, // 已付款
-        SHIPPED, // 已发货
-        NOT_SHIPPED, // 未发货
-        COMPLETED, // 已完成
-        CANCELLED, // 已取消
-        REFUNDED // 已退款
-    }
+    @TableField(value = "remark")
+    @Schema(description = "备注")
+    private String remark;
 }   

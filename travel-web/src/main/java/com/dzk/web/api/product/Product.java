@@ -1,19 +1,26 @@
 package com.dzk.web.api.product;
 
-import org.springframework.stereotype.Service;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.dzk.common.common.BaseEntity;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.Builder;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
-@Service
+import java.math.BigDecimal;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Product extends BaseEntity {
 
     @TableId(type = IdType.AUTO)
-    private String id;
+    @Schema(description = "文创产品id")
+    private Long id;
 
     @TableField(value = "name")
     @Schema(description = "文创产品名称")
@@ -33,15 +40,15 @@ public class Product extends BaseEntity {
 
     @TableField(value = "price")
     @Schema(description = "文创产品价格")
-    private String price;
+    private BigDecimal price;
 
     @TableField(value = "stock")
     @Schema(description = "文创产品库存")
-    private String stock;
+    private Integer stock;
 
     @TableField(value = "category_id")
     @Schema(description = "文创产品分类id")
-    private String categoryId;
+    private Long categoryId;
 
     @TableField(value = "status")
     @Schema(description = "文创产品状态(是否上架)")
@@ -49,7 +56,7 @@ public class Product extends BaseEntity {
 
     @TableField(value = "sales")
     @Schema(description = "文创产品销量")
-    private String sales;
+    private Integer sales;
 
     @TableField(value = "is_recommend")
     @Schema(description = "是否推荐")
@@ -59,4 +66,7 @@ public class Product extends BaseEntity {
     @Schema(description = "是否热门")
     private Boolean isHot;
 
+    @TableField(value = "cover_image_id")
+    @Schema(description = "封面图片id")
+    private Long coverImageId;
 }

@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 
 import com.dzk.common.common.BaseEntity;
 
 @Data
+@Builder
 public class Category extends BaseEntity {
 
     @TableId(type = IdType.AUTO)

@@ -4,8 +4,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Builder;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Schema(description = "攻略数据传输对象")
 public class GuideDto {
 
@@ -57,9 +63,21 @@ public class GuideDto {
     @Schema(description = "更新时间")
     private String updateTime;
 
+    @Schema(description = "markdown文件UUID")
+    private String markdownUuid;
+
+    @Schema(description = "英文markdown文件UUID")
+    private String markdownUuidEn;
+
+    @Schema(description = "英文markdown文件路径")
+    private String markdownPathEn;
+
+    @Schema(description = "中文markdown文件路径")
+    private String markdownPath;
+
     @Data
     @Schema(description = "攻略输入对象")
-    public class GuideInput {
+    public static class Input {
 
         @Schema(description = "攻略排序")
         private Integer sort;
@@ -90,6 +108,7 @@ public class GuideDto {
         private String content;
 
         @Schema(description = "攻略英文内容")
+        @NotBlank(message = "攻略英文内容不能为空") 
         private String contentEn;
     }
 }   

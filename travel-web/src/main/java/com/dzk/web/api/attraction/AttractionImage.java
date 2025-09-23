@@ -6,9 +6,15 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 import com.dzk.common.common.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AttractionImage extends BaseEntity {
 
     @TableId(type = IdType.AUTO)

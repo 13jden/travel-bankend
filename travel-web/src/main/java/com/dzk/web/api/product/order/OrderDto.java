@@ -17,12 +17,6 @@ public class OrderDto {
     @Schema(description = "订单id")
     private Long id;
 
-    @Schema(description = "订单金额")
-    private BigDecimal orderPrice;
-
-    @Schema(description = "订单状态")
-    private String status;
-
     @Schema(description = "用户id")
     private Long userId;
 
@@ -31,6 +25,9 @@ public class OrderDto {
 
     @Schema(description = "数量")
     private Integer quantity;
+
+    @Schema(description = "订单金额")
+    private BigDecimal orderPrice;
 
     @Schema(description = "地址")
     private String address;
@@ -41,15 +38,15 @@ public class OrderDto {
     @Schema(description = "联系电话")
     private String phone;
 
+    @Schema(description = "订单状态")
+    private String status;
+
+    @Schema(description = "备注")
+    private String remark;
+
     @Data
     @Schema(description = "订单输入数据传输对象")
     public static class Input {
-        @Schema(description = "订单金额")
-        private BigDecimal orderPrice;
-
-        @Schema(description = "订单状态")
-        private String status;
-
         @Schema(description = "用户id")
         private Long userId;
 
@@ -59,6 +56,9 @@ public class OrderDto {
         @Schema(description = "数量")
         private Integer quantity;
 
+        @Schema(description = "订单金额")
+        private BigDecimal orderPrice;
+
         @Schema(description = "地址")
         private String address;
 
@@ -67,7 +67,12 @@ public class OrderDto {
         
         @Schema(description = "联系电话")
         private String phone;
-    }
 
+        @Schema(description = "订单状态")
+        private String status;
+
+        @Schema(description = "备注")
+        private String remark;
+    }
 }
 

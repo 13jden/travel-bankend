@@ -1,5 +1,9 @@
 package com.dzk.web.api.product;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -9,7 +13,10 @@ import com.dzk.common.common.BaseEntity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Service
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductImage extends BaseEntity {
     
     @TableId(type = IdType.AUTO)

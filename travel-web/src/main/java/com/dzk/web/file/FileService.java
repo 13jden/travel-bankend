@@ -30,7 +30,7 @@ public class FileService extends ServiceImpl<FileMapper, FileEntity> {
      * 上传文件
      */
     @Transactional
-    public String upload(MultipartFile file) {
+    public String upload(MultipartFile file, String path) {
         try {
             // 1. 检查文件是否为空
             if (file.isEmpty()) {
@@ -54,7 +54,12 @@ public class FileService extends ServiceImpl<FileMapper, FileEntity> {
             String fileName = uuid + extension;
             
             // 4. 创建上传目录
-            File uploadDir = new File(uploadPath);
+            String finalUploadPath = uploadPath;
+            if (path != null && !path.isEmpty()) {
+                finalUploadPath = uploadPath + path + "/";
+            }
+            
+            File uploadDir = new File(finalUploadPath);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
             }
@@ -66,12 +71,14 @@ public class FileService extends ServiceImpl<FileMapper, FileEntity> {
             // 6. 保存文件信息到数据库
             FileEntity fileEntity = new FileEntity();
             fileEntity.setUuid(uuid);
-            fileEntity.setPath(uploadPath);
+            fileEntity.setPath(finalUploadPath);
             fileEntity.setType(file.getContentType());
             fileEntity.setExtension(extension);
             fileEntity.setSize(file.getSize());
             this.save(fileEntity);
+
             
+
             // 7. 返回UUID
             return uuid;
             
@@ -80,6 +87,14 @@ public class FileService extends ServiceImpl<FileMapper, FileEntity> {
         } catch (Exception e) {
             throw new RuntimeException("文件上传失败: " + e.getMessage());
         }
+    }
+
+    /**
+     * 上传文件（默认路径）
+     */
+    @Transactional
+    public String upload(MultipartFile file) {
+        return upload(file, null);
     }
     
     /**

@@ -27,6 +27,9 @@ public class AttractionImageDto {
     @Data
     @Schema(description = "景点图片输入数据传输对象")
     public static class Input {
+        @Schema(description = "景点图片id")
+        private Long imageId;
+
         @Schema(description = "文件id")
         private Long fileId;
         

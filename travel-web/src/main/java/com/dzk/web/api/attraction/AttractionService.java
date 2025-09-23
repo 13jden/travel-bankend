@@ -96,16 +96,33 @@ public class AttractionService extends ServiceImpl<AttractionMapper, Attraction>
             Attraction attraction = AttractionConverter.toEntity(input);
             attraction.setId(id);
             attractionMapper.updateById(attraction);
-            
+            List<AttractionImage> oldImages = attractionImageMapper
+                    .selectListByAttractionId(id);
             // 3. 处理景点图片
-            if (input.getImages() != null) {
-                // 删除原有图片关联
-                deleteAttractionImages(id);
-                // 添加新图片关联
-                if (!input.getImages().isEmpty()) {
-                    saveAttractionImages(id, input.getImages());
+            for (AttractionImageDto.Input image : input.getImages()){
+                if (image.getImageId()!=null){
+                    AttractionImage attractionImage = AttractionImage.builder()
+                            .attractionId(id)
+                            .id(image.getImageId())
+                            .sort(image.getSort())
+                            .fileId(image.getFileId())
+                            .build();
+                    attractionImageMapper.updateById(attractionImage);
+                    oldImages.removeIf(old -> old.getId().equals(image.getImageId()));
+                }else {
+                    AttractionImage attractionImage = AttractionImage.builder()
+                            .attractionId(id)
+                            .sort(image.getSort())
+                            .fileId(image.getFileId())
+                            .build();
+                    attractionImageMapper.insert(attractionImage);
                 }
             }
+            for (AttractionImage image : oldImages) {
+                attractionImageMapper.deleteById(image.getId());
+                fileService.deleteFileById(image.getFileId());
+            }
+
             
             // 4. 返回完整的景点信息
             return getDetail(id);
@@ -227,11 +244,7 @@ public class AttractionService extends ServiceImpl<AttractionMapper, Attraction>
      * 获取景点图片列表
      */
     private List<AttractionImageDto> getAttractionImages(Long attractionId) {
-        QueryWrapper<AttractionImage> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("attraction_id", attractionId);
-        queryWrapper.orderByAsc("sort");
-        
-        List<AttractionImage> attractionImages = attractionImageMapper.selectList(queryWrapper);
+        List<AttractionImage> attractionImages = attractionImageMapper.selectListByAttractionId(attractionId);
         
         return attractionImages.stream().map(image -> {
             AttractionImageDto dto = new AttractionImageDto();
@@ -295,7 +308,7 @@ public class AttractionService extends ServiceImpl<AttractionMapper, Attraction>
         if (attractionImage == null) {
             throw new BusinessException("图片不存在");
         }
-        
+        fileService.deleteFileById(attractionImage.getFileId());
         return attractionImageMapper.deleteById(imageId) > 0;
     }
 
@@ -308,7 +321,7 @@ public class AttractionService extends ServiceImpl<AttractionMapper, Attraction>
         if (attractionImage == null) {
             throw new BusinessException("图片不存在");
         }
-        
+
         attractionImage.setSort(sort);
         return attractionImageMapper.updateById(attractionImage) > 0;
     }
