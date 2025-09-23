@@ -1,5 +1,7 @@
 package com.dzk.web.api.attraction;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.Builder;
 import lombok.AllArgsConstructor;
@@ -43,6 +45,14 @@ public class AttractionDto {
     private String contentEn;
 
     @Data
+    @Schema(description = "景点详情")
+    public static class Detail extends AttractionDto {
+       
+       @Schema(description = "景点图片列表")
+       private List<AttractionImageDto> images;
+    }
+
+    @Data
     @Schema(description = "景点输入数据传输对象")
     public static class Input {
 
@@ -72,5 +82,8 @@ public class AttractionDto {
 
         @Schema(description = "景点是否启用")
         private Boolean isEnable;
+
+        @Schema(description = "景点图片列表")
+        private List<AttractionImageDto.Input> images;
     }
 }

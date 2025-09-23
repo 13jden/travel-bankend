@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 
 @RestController 
 @RequestMapping("/api/auth")
-@Tag(name = "AuthController", description = "认证控制器")
+@Tag(name = "权限认证")
 public class AuthController {
 
     @Autowired
@@ -21,13 +21,13 @@ public class AuthController {
 
     
     @PostMapping("/login")
-    @Operation(summary = "登录", description = "登录", operationId = "Login")
+    @Operation(summary = "登录", description = "登录")
     public Result<TokenUserDto> login(@RequestBody LoginRequest request) throws Exception {
         return Result.success(authService.login(request));
     }
 
     @GetMapping("/code")
-    @Operation(summary = "获取图片验证码 默认为算术题", description = "获取图片验证码 默认为算术题", operationId = "GetCode")
+    @Operation(summary = "获取图片验证码 默认为算术题", description = "获取图片验证码 默认为算术题")
     public Result<CaptchaDto> getCode() {
         CaptchaDto imgResult = authService.getCaptcha();
 
@@ -35,13 +35,13 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    @Operation(summary = "重置密码", description = "重置密码", operationId = "ResetPassword")
+    @Operation(summary = "重置密码", description = "重置密码")
     public Result resetPassword(@RequestBody PasswordDto passwordDto) {
         return Result.success(authService.resetPassword(passwordDto));
     }
 
     @GetMapping("/verify")
-    @Operation(summary = "验证验证码", description = "验证验证码", operationId = "VerifyCaptcha")
+    @Operation(summary = "验证验证码", description = "验证验证码")
     public Result verifyCaptcha(@RequestParam String uuid, @RequestParam String code) {
         return Result.success(authService.verifyCaptcha(uuid,code ));
     }

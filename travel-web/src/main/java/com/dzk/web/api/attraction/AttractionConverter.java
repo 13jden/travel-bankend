@@ -33,6 +33,29 @@ public class AttractionConverter {
     }
     
     /**
+     * 实体转详情DTO
+     */
+    public static AttractionDto.Detail toDetailDto(Attraction attraction) {
+        if (attraction == null) {
+            return null;
+        }
+        
+        AttractionDto.Detail detail = new AttractionDto.Detail();
+        detail.setId(attraction.getId());
+        detail.setTitle(attraction.getTitle());
+        detail.setTitleEn(attraction.getTitleEn());
+        detail.setDescription(attraction.getDescription());
+        detail.setDescriptionEn(attraction.getDescriptionEn());
+        detail.setSort(attraction.getSort());
+        detail.setCoverImageId(attraction.getCoverImageId());
+        detail.setIsEnable(attraction.getIsEnable());
+        detail.setContent(attraction.getContent());
+        detail.setContentEn(attraction.getContentEn());
+        
+        return detail;
+    }
+    
+    /**
      * 实体列表转DTO列表
      */
     public static List<AttractionDto> toDtoList(List<Attraction> attractions) {
@@ -62,6 +85,7 @@ public class AttractionConverter {
                 .contentEn(input.getContentEn())
                 .coverImageId(input.getCoverImageId())
                 .isEnable(input.getIsEnable())
+                .sort(input.getSort())
                 .build();
     }
 }   

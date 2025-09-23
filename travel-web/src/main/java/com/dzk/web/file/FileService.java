@@ -4,7 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -17,12 +23,13 @@ public class FileService extends ServiceImpl<FileMapper, FileEntity> {
     @Autowired
     FileMapper fileMapper;
 
-    @Value("${file.upload.path:/opt/travel/files}")
+    @Value("${upload.commonPath}")
     private String uploadPath;
     
     /**
      * 上传文件
      */
+    @Transactional
     public String upload(MultipartFile file) {
         try {
             // 1. 检查文件是否为空
@@ -76,8 +83,9 @@ public class FileService extends ServiceImpl<FileMapper, FileEntity> {
     }
     
     /**
-     * 根据UUID获取文件详情
+     * 根据ID获取文件详情
      */
+    @Transactional
     public FileDto getFileById(Long id) {
        FileEntity file = fileMapper.selectById(id);
        return FileDto.builder()
@@ -91,8 +99,94 @@ public class FileService extends ServiceImpl<FileMapper, FileEntity> {
     }
     
     /**
-     * 根据UUID删除文件
+     * 根据UUID获取文件实体
      */
+    @Transactional
+    public FileEntity getFileByUuid(String uuid) {
+        QueryWrapper<FileEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("uuid", uuid);
+        return fileMapper.selectOne(queryWrapper);
+    }
+    
+    /**
+     * 根据UUID下载文件
+     */
+    public ResponseEntity<Resource> downloadFile(String uuid) {
+        try {
+            // 1. 根据UUID获取文件信息
+            FileEntity fileEntity = getFileByUuid(uuid);
+            if (fileEntity == null) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            // 2. 构建文件路径
+            String filePath = fileEntity.getPath() + fileEntity.getUuid() + fileEntity.getExtension();
+            File file = new File(filePath);
+            
+            if (!file.exists()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            // 3. 创建文件资源
+            Resource resource = new FileSystemResource(file);
+            
+            // 4. 设置响应头
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileEntity.getUuid() + fileEntity.getExtension() + "\"");
+            headers.add(HttpHeaders.CONTENT_TYPE, fileEntity.getType());
+            headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(fileEntity.getSize()));
+            
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.parseMediaType(fileEntity.getType()))
+                    .body(resource);
+                    
+        } catch (Exception e) {
+            throw new RuntimeException("文件下载失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 根据UUID预览文件
+     */
+    public ResponseEntity<Resource> viewFile(String uuid) {
+        try {
+            // 1. 根据UUID获取文件信息
+            FileEntity fileEntity = getFileByUuid(uuid);
+            if (fileEntity == null) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            // 2. 构建文件路径
+            String filePath = fileEntity.getPath() + fileEntity.getUuid() + fileEntity.getExtension();
+            File file = new File(filePath);
+            
+            if (!file.exists()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            // 3. 创建文件资源
+            Resource resource = new FileSystemResource(file);
+            
+            // 4. 设置响应头（用于浏览器预览）
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_TYPE, fileEntity.getType());
+            headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(fileEntity.getSize()));
+            
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.parseMediaType(fileEntity.getType()))
+                    .body(resource);
+                    
+        } catch (Exception e) {
+            throw new RuntimeException("文件预览失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 根据ID删除文件
+     */
+    @Transactional
     public boolean deleteFileById(Long uuid) {
         try {
             // 1. 获取文件信息

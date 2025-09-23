@@ -3,12 +3,14 @@ package com.dzk.web.file;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import com.dzk.common.common.BaseEntity;
 
 @Data
+@TableName("file")  // 添加这个注解指定表名
 public class FileEntity extends BaseEntity {
 
     @TableId(type = IdType.AUTO)
