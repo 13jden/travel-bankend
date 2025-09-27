@@ -1,6 +1,6 @@
 package com.dzk.web.config;
 
-import com.dzk.common.redis.RedisComponent;
+import com.dzk.web.redis.RedisComponent;
 import com.dzk.web.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

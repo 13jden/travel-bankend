@@ -19,13 +19,13 @@ public class FileController {
 
     @PostMapping("/upload")
     @Operation(summary = "上传文件", description = "上传文件到服务器，返回UUID")
-    public Result upload(@RequestPart("file") MultipartFile file) {
+    public Result<Long> upload(@RequestPart("file") MultipartFile file) {
         return Result.success(fileService.upload(file));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "获取文件详情", description = "根据ID获取文件详情")
-    public Result getFileById(@PathVariable Long id) {
+    public Result<FileDto> getFileById(@PathVariable Long id) {
         return Result.success(fileService.getFileById(id));
     }
 

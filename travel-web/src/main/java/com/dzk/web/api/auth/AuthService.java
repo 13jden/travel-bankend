@@ -1,6 +1,5 @@
 package com.dzk.web.api.auth;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzk.common.common.Result;
 import com.dzk.common.constants.Constants;
 import com.dzk.common.exception.BusinessException;
@@ -9,6 +8,7 @@ import com.dzk.web.api.auth.captcha.CaptchaCodeType;
 import com.dzk.web.api.auth.captcha.CaptchaProvider;
 import com.dzk.web.api.user.User;
 import com.dzk.web.api.user.UserService;
+import com.dzk.web.redis.RedisComponent;
 import com.dzk.web.utils.JwtUtil;
 import com.wf.captcha.base.Captcha;
 
@@ -36,7 +36,7 @@ public class AuthService {
     private UserService userService;
 
     @Autowired
-    private com.dzk.common.redis.RedisComponent redisComponent;
+    private RedisComponent redisComponent;
 
     @Autowired
     private JwtUtil jwtUtil;

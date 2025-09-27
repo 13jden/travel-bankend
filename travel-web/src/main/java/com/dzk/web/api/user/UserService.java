@@ -1,8 +1,9 @@
 package com.dzk.web.api.user;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.dzk.common.redis.RedisComponent;
 
+
+import com.dzk.web.redis.RedisComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

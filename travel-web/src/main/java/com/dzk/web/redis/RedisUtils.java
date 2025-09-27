@@ -1,4 +1,4 @@
-package com.dzk.common.redis;
+package com.dzk.web.redis;
 
 
 import jakarta.annotation.Resource;

@@ -31,10 +31,9 @@ public class WebSecurityConfig {
                 .requestMatchers(
 //                    "/user/login",
 //                    "/user/register",
-//                    "/api/**",   // 放行所有 auth 相关接口
+//                    "/api/**",
 //                    "/user/autologin",
 //                    "/checkcode/**",
-//                    "/actuator/health",
                     "/**"
                 ).permitAll()
                 // admin开头的路径需要ADMIN角色

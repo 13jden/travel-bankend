@@ -1,4 +1,4 @@
-package com.dzk.common.redis;
+package com.dzk.web.redis;
 
 import com.dzk.common.constants.Constants;
 
@@ -6,16 +6,13 @@ import com.dzk.common.constants.Constants;
 import com.dzk.web.api.auth.TokenUserDto;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Component
 public class RedisComponent {
 
     @Resource
-    private com.dzk.common.redis.RedisUtils redisUtils;
+    private com.dzk.web.redis.RedisUtils redisUtils;
 
     public String saveCheckCode(String code){
         String checkCodeKey = UUID.randomUUID().toString();

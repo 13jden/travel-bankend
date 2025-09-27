@@ -1,6 +1,6 @@
 package com.dzk.web.utils;
 
-import com.dzk.common.redis.RedisComponent;
+import com.dzk.web.redis.RedisComponent;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.MACSigner;

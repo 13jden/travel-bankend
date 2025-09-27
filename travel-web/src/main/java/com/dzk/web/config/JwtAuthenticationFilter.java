@@ -1,9 +1,9 @@
 package com.dzk.web.config;
 
 import com.dzk.common.constants.Constants;
-import com.dzk.common.redis.RedisComponent;
 import com.dzk.web.api.user.User;
 import com.dzk.web.api.auth.TokenUserDto;
+import com.dzk.web.redis.RedisComponent;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -22,8 +22,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 

@@ -28,9 +28,10 @@ public class FileService extends ServiceImpl<FileMapper, FileEntity> {
     
     /**
      * 上传文件
+     * @return
      */
     @Transactional
-    public String upload(MultipartFile file, String path) {
+    public Long upload(MultipartFile file, String path) {
         try {
             // 1. 检查文件是否为空
             if (file.isEmpty()) {
@@ -80,7 +81,7 @@ public class FileService extends ServiceImpl<FileMapper, FileEntity> {
             
 
             // 7. 返回UUID
-            return uuid;
+            return fileEntity.getId();
             
         } catch (IOException e) {
             throw new RuntimeException("文件保存失败: " + e.getMessage());
@@ -93,7 +94,7 @@ public class FileService extends ServiceImpl<FileMapper, FileEntity> {
      * 上传文件（默认路径）
      */
     @Transactional
-    public String upload(MultipartFile file) {
+    public Long upload(MultipartFile file) {
         return upload(file, null);
     }
     

@@ -1,6 +1,6 @@
 package com.dzk.web.api.user;
 
-import com.dzk.common.redis.RedisComponent;
+import com.dzk.web.redis.RedisComponent;
 import com.dzk.web.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
