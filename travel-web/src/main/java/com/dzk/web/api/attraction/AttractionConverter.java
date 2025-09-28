@@ -25,7 +25,6 @@ public class AttractionConverter {
                 .description(attraction.getDescription())
                 .descriptionEn(attraction.getDescriptionEn())
                 .sort(attraction.getSort())
-                .coverImageId(attraction.getCoverImageId())
                 .isEnable(attraction.getIsEnable())
                 .content(attraction.getContent())
                 .contentEn(attraction.getContentEn())
@@ -47,7 +46,6 @@ public class AttractionConverter {
         detail.setDescription(attraction.getDescription());
         detail.setDescriptionEn(attraction.getDescriptionEn());
         detail.setSort(attraction.getSort());
-        detail.setCoverImageId(attraction.getCoverImageId());
         detail.setIsEnable(attraction.getIsEnable());
         detail.setContent(attraction.getContent());
         detail.setContentEn(attraction.getContentEn());

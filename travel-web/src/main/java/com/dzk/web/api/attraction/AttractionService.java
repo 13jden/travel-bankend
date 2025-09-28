@@ -141,7 +141,7 @@ public class AttractionService extends ServiceImpl<AttractionMapper, Attraction>
             throw new BusinessException("景点不存在");
         }
         
-        AttractionDto dto = AttractionConverter.toDto(attraction);
+        AttractionDto dto = AttractionConverter.toDetailDto(attraction);
         
         // 获取景点图片信息
         List<AttractionImageDto> images = getAttractionImages(id);
@@ -247,16 +247,15 @@ public class AttractionService extends ServiceImpl<AttractionMapper, Attraction>
         List<AttractionImage> attractionImages = attractionImageMapper.selectListByAttractionId(attractionId);
         
         return attractionImages.stream().map(image -> {
+            FileEntity fileEntity = fileService.getById(image.getFileId());
             AttractionImageDto dto = new AttractionImageDto();
             dto.setId(image.getId());
             dto.setAttractionId(image.getAttractionId());
-            dto.setFileId(image.getFileId());
             dto.setSort(image.getSort());
-            
-            // 获取文件UUID
-            FileEntity fileEntity = fileService.getById(image.getFileId());
+
+
             if (fileEntity != null) {
-                dto.setFileUrl(filePath+fileEntity.getUuid());
+                dto.setCoverImageUuid(fileEntity.getUuid());
             }
 
             return dto;
@@ -292,8 +291,6 @@ public class AttractionService extends ServiceImpl<AttractionMapper, Attraction>
         AttractionImageDto dto = new AttractionImageDto();
         dto.setId(attractionImage.getId());
         dto.setAttractionId(attractionImage.getAttractionId());
-        dto.setFileUrl(filePath+fileEntity.getUuid());
-        dto.setFileId(fileEntity.getId());
         dto.setSort(attractionImage.getSort());
         
         return dto;

@@ -15,11 +15,9 @@ public class AttractionImageDto {
     @Schema(description = "景点id")
     private Long attractionId;
 
-    @Schema(description = "文件url")
-    private String fileUrl;
 
-    @Schema(description = "文件id")
-    private Long fileId;
+    @Schema(description = "文件uuid")
+    private String CoverImageUuid;
 
     @Schema(description = "排序")
     private Integer sort;
