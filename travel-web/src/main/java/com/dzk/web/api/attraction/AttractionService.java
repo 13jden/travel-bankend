@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzk.common.exception.BusinessException;
+import com.dzk.web.file.FileDto;
 import com.dzk.web.file.FileEntity;
 import com.dzk.web.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,8 +54,17 @@ public class AttractionService extends ServiceImpl<AttractionMapper, Attraction>
         // 使用 Pageable 创建 MyBatis-Plus 的 Page 对象
         Page<Attraction> page = new Page<>(pageable.getPageNumber() + 1, pageable.getPageSize());
         Page<Attraction> attractionPage = this.page(page, queryWrapper);
-        
-        return AttractionConverter.toDtoList(attractionPage.getRecords());
+
+        return attractionPage.getRecords().stream()
+                .map(attraction -> {
+                    AttractionDto dto = AttractionConverter.toDto(attraction);
+                    FileDto file = fileService.getFileById(attraction.getCoverImageId());
+                    if (file != null) {
+                        dto.setCoverImageUuid(file.getUuid());
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     /**

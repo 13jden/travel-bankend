@@ -33,7 +33,7 @@ public class AttractionDto {
     private Integer sort;
 
     @Schema(description = "景点封面图片id")
-    private Long coverImageUuid;
+    private String coverImageUuid;
 
     @Schema(description = "景点是否启用")
     private Boolean isEnable;
