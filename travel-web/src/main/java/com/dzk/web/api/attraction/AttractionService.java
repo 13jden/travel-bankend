@@ -105,6 +105,7 @@ public class AttractionService extends ServiceImpl<AttractionMapper, Attraction>
             // 2. 更新景点基本信息
             Attraction attraction = AttractionConverter.toEntity(input);
             attraction.setId(id);
+            attraction.setCoverImageId(input.getImages().get(0).getFileId());
             attractionMapper.updateById(attraction);
             List<AttractionImage> oldImages = attractionImageMapper
                     .selectListByAttractionId(id);
