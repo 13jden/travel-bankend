@@ -19,7 +19,7 @@ public class FileController {
 
     @PostMapping("/upload")
     @Operation(summary = "上传文件", description = "上传文件到服务器，返回UUID")
-    public Result<Long> upload(@RequestPart("file") MultipartFile file) {
+    public Result<FileDto> upload(@RequestPart("file") MultipartFile file) {
         return Result.success(fileService.upload(file));
     }
 
