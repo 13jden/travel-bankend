@@ -60,7 +60,6 @@ jobs:
             # 创建部署目录
             mkdir -p /opt/travel-bankend
             
-            
             # 设置目录权限
             chmod -R 755 /opt/travel/files
             
@@ -100,7 +99,7 @@ jobs:
             cd /opt/travel-bankend
             docker-compose down || true
             
-            # 启动新容器
+            # 启动新容器（只启动应用，MySQL和Redis保持运行）
             docker-compose up -d
             
             # 清理旧镜像
