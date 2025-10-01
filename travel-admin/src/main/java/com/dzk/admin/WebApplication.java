@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@SpringBootApplication(scanBasePackages = "com.dzk.admin")
+@SpringBootApplication(scanBasePackages = "com.dzk")
 @EnableTransactionManagement
 @EnableScheduling
 @EnableAsync
