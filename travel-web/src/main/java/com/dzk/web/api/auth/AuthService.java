@@ -14,6 +14,7 @@ import com.wf.captcha.base.Captcha;
 
 import java.util.UUID;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -27,6 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Collections;
 
 @Service
+@Slf4j
 public class AuthService {
 
     @Autowired
@@ -58,6 +60,7 @@ public class AuthService {
                 throw new ValidationException("验证码错误");
             }
         }
+        log.info("准备查数据库：");
         User user = userService.getUserByUserName(request.getUsername());
         if(user == null){
             throw new BusinessException("用户不存在");
@@ -66,10 +69,11 @@ public class AuthService {
         if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
             throw new BusinessException("用户名或密码错误");
         }
-        
+        log.info("密码核对成功！！！");
         // 生成JWT token
         String token = jwtUtil.generateToken(user.getUsername());
-        
+        log.info("jwt令牌生成成功！，准备保存");
+
         // 存储用户信息到Spring Security上下文
         UsernamePasswordAuthenticationToken authentication = 
             new UsernamePasswordAuthenticationToken(
@@ -78,11 +82,11 @@ public class AuthService {
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()))
             );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        
+        log.info("security保存成功");
         // 存储到Redis
         TokenUserDto tokenUserDto = new TokenUserDto().toTokenUserDto(user, token);
         redisComponent.saveUserToken(Constants.REDIS_KEY_TOKEN_WEB+token, tokenUserDto);
-        
+        log.info("redis保存成功");
         return tokenUserDto;
     }
 
