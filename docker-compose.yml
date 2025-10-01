@@ -18,9 +18,8 @@ services:
       - /opt/travel/files:/opt/travel/files
     networks:
       - travel-network
-    # 移除depends_on，因为MySQL和Redis现在是外部服务
-    # depends_on:
-    #   mysql:
-    #     condition: service_healthy
-    #   redis:
-    #     condition: service_started 
+
+
+networks:
+  travel-network:
+    driver: bridge 
