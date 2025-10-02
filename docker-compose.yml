@@ -16,10 +16,3 @@ services:
       - ./config:/app/config
       # 挂载文件上传目录
       - /opt/travel/files:/opt/travel/files
-    networks:
-      - travel-network
-
-
-networks:
-  travel-network:
-    driver: bridge 
