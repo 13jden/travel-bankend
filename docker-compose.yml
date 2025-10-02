@@ -16,8 +16,6 @@ services:
       - ./config:/app/config
       # 挂载文件上传目录
       - /opt/travel/files:/opt/travel/files
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     networks:
       - travel-network
 
