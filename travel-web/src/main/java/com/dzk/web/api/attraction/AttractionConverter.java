@@ -26,8 +26,6 @@ public class AttractionConverter {
                 .descriptionEn(attraction.getDescriptionEn())
                 .sort(attraction.getSort())
                 .isEnable(attraction.getIsEnable())
-                .content(attraction.getContent())
-                .contentEn(attraction.getContentEn())
                 .build();
     }
     
@@ -49,6 +47,8 @@ public class AttractionConverter {
         detail.setIsEnable(attraction.getIsEnable());
         detail.setContent(attraction.getContent());
         detail.setContentEn(attraction.getContentEn());
+        detail.setLongitude(attraction.getLongitude());
+        detail.setLatitude(attraction.getLatitude());
         
         return detail;
     }
@@ -84,6 +84,8 @@ public class AttractionConverter {
                 .coverImageId(input.getCoverImageId())
                 .isEnable(input.getIsEnable())
                 .sort(input.getSort())
+                .longitude(input.getLongitude())
+                .latitude(input.getLatitude())
                 .build();
     }
 }   

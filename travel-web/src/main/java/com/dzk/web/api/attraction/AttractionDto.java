@@ -38,18 +38,26 @@ public class AttractionDto {
     @Schema(description = "景点是否启用")
     private Boolean isEnable;
 
-    @Schema(description = "景点内容")
-    private String content;
 
-    @Schema(description = "景点英文内容")
-    private String contentEn;
 
     @Data
     @Schema(description = "景点详情")
     public static class Detail extends AttractionDto {
        
-       @Schema(description = "景点图片列表")
-       private List<AttractionImageDto> images;
+        @Schema(description = "景点图片列表")
+        private List<AttractionImageDto> images;
+       
+        @Schema(description = "景点内容")
+        private String content;
+
+        @Schema(description = "景点英文内容")
+        private String contentEn;
+
+        @Schema(description = "经度")
+        private Double longitude;
+
+        @Schema(description = "纬度")
+        private Double latitude;
     }
 
     @Data
@@ -85,5 +93,11 @@ public class AttractionDto {
 
         @Schema(description = "景点图片列表")
         private List<AttractionImageDto.Input> images;
+
+        @Schema(description = "经度")
+        private Double longitude;
+
+        @Schema(description = "纬度")
+        private Double latitude;
     }
 }

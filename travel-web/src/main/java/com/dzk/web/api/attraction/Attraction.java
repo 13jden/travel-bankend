@@ -53,6 +53,14 @@ public class Attraction extends BaseEntity {
     @Schema(description = "景点英文内容")
     private String contentEn;
 
+    @TableField(value = "longitude")
+    @Schema(description = "经度")
+    private Double longitude;
+    
+    @TableField(value = "latitude")
+    @Schema(description = "纬度")
+    private Double latitude;
+
     @Data
     @Schema(description = "路线景点")
     public static class ScenicSpot {
